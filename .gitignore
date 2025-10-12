@@ -1,0 +1,88 @@
+# ============================================
+# 🌱 Java / Spring Boot
+# ============================================
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.iml
+
+# Maven
+target/
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ============================================
+# 🛠️ IDEs y Herramientas
+# ============================================
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VSCode
+.vscode/
+
+# ============================================
+# 📁 Sistema operativo
+# ============================================
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# 📱 Android (si lo agregas al mismo repo)
+# ============================================
+*.apk
+*.ap_
+*.dex
+*.class
+*.keystore
+
+# Gradle cache
+.gradle/
+local.properties
+
+# Android build folders
+**/build/
+**/captures/
+
+# ============================================
+# 🧪 Testing & Coverage
+# ============================================
+/test-output/
+/surefire-reports/
+/jacoco/
+coverage/
+
+# ============================================
+# 🔒 Archivos sensibles (opcional)
+# ============================================
+.env
+*.secret
+*.key
+*.pem
+
+# ============================================
+# 🗂️ Sistema de OS y archivos temporales
+# ============================================
+*.swp
+*.swo
+*.tmp
+*.bak
