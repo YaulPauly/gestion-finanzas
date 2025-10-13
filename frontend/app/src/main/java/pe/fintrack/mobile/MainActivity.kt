@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             FintrackMobileTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Caleb",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
