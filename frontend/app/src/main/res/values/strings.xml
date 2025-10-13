@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fintrack Mobile</string>
+    <string name="descripcion_notificaciones">Ver notificaciones</string>
 </resources>
