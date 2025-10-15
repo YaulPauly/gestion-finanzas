@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
+import pe.fintrack.mobile.ui.theme.components.FinTrackTopBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,9 +20,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FintrackMobileTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    topBar = {
+                        FinTrackTopBar(
+                            nombreUsuario = "Axel Del Solar",
+                            onNotificationClick = {  },
+                            modifier = Modifier
+                        )
+                    }
+                ) { innerPadding ->
+
                     Greeting(
-                        name = "Android",
+                        name = "Mundo",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

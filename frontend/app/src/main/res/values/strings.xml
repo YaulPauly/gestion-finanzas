@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Fintrack Mobile</string>
     <string name="descripcion_notificaciones">Ver notificaciones</string>
+    <string name="current_balance">Saldo Actual</string>
+    <string name="register_expense">Registrar gasto</string>
+    <string name="register_income">Registrar ingreso</string>
+    <string name="more_options">Más opciones</string>
+
 </resources>
