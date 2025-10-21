@@ -1,3 +1,6 @@
+package pe.fintrack.mobile.ui.theme.components
+
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -20,45 +24,48 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pe.fintrack.mobile.R
 import java.text.DecimalFormat
 
 @Composable
-fun CurrentBalanceCard(
-    currentBalance: Double,
-    onRegisterExpenseClick: () -> Unit,
-    onRegisterIncomeClick: () -> Unit,
+fun SaldoActualComponent(
+    saldoActual: Double,
+    onRegistrarGastoClick: () -> Unit,
+    onRegistrarIngresoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isMenuExpanded by remember { mutableStateOf(false) }
 
-    // Formateador para la moneda. Se usa 'remember' para que no se recree en cada recomposición.
     val formatter = remember { DecimalFormat("S/ #,##0.00") }
 
-    // Formatea el saldo y recuerda el resultado. Solo se recalcula si 'currentBalance' cambia.
-    val formattedBalance = remember(currentBalance) {
-        formatter.format(currentBalance)
+    val formattedBalance = remember(saldoActual) {
+        formatter.format(saldoActual)
     }
 
-    Surface(modifier = modifier) {
+    Surface(modifier = modifier, color= Color.Transparent) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(
-                    text = stringResource(id = R.string.current_balance),
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(id = R.string.saldo_actual),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White
+
                 )
                 Text(
                     text = formattedBalance,
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White,
                 )
             }
             Box {
@@ -66,7 +73,8 @@ fun CurrentBalanceCard(
                 IconButton(onClick = { isMenuExpanded = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.more_options)
+                        contentDescription = stringResource(R.string.mas_opciones),
+                        tint = Color.White
                     )
                 }
 
@@ -76,17 +84,17 @@ fun CurrentBalanceCard(
                     onDismissRequest = { isMenuExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.register_expense)) },
+                        text = { Text(stringResource(R.string.registrar_gasto)) },
                         onClick = {
                             isMenuExpanded = false
-                            onRegisterExpenseClick()
+                            onRegistrarGastoClick()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.register_income)) },
+                        text = { Text(stringResource(R.string.registrar_ingreso)) },
                         onClick = {
                             isMenuExpanded = false
-                            onRegisterIncomeClick()
+                            onRegistrarIngresoClick()
                         }
                     )
                 }
@@ -97,12 +105,11 @@ fun CurrentBalanceCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun CurrentBalanceCardPreview() {
-    // FintrackMobileTheme { // Envuelve con tu tema si es necesario
-    CurrentBalanceCard(
-        currentBalance = 5432.50,
-        onRegisterExpenseClick = { /* Acción de prueba */ },
-        onRegisterIncomeClick = { /* Acción de prueba */ }
+private fun SaldoActualPreview() {
+    SaldoActualComponent(
+        saldoActual = 5432.50,
+        onRegistrarGastoClick = { /* Acción de prueba */ },
+        onRegistrarIngresoClick = { /* Acción de prueba */ }
     )
-    // }
 }
+

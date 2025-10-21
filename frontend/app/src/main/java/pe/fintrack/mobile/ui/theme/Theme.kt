@@ -18,14 +18,14 @@ import androidx.compose.ui.platform.LocalContext
 import pe.fintrack.mobile.R
 
 
-val LightGrayBackground = Color(0xFFF5F5F5) // Un gris muy claro
+val LightGrayBackground = Color(0xFFE2E2E2) // Un gris muy claro
 val DarkGrayBackground = Color(0xFF121212)
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
 
-    background = DarkGrayBackground,
+    background = LightGrayBackground,
     surface = DarkGrayBackground,
 
     onBackground = Color.White, // Texto/iconos sobre el fondo oscuro
