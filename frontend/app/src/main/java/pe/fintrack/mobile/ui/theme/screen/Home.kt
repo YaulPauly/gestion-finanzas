@@ -16,11 +16,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import pe.fintrack.mobile.ui.theme.components.AppScreen
 import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
 import java.util.Locale
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -34,8 +36,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         ) {
             SaldoActualComponent(
                 saldoActual = 4500.50,
-                onRegistrarGastoClick = { /* TODO: Navegar a registrar gasto */ },
-                onRegistrarIngresoClick = { /* TODO: Navegar a registrar ingreso */ }
+                onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
+                onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
             )
         }
 
@@ -159,7 +161,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 @Composable
 fun ResumenCard(
     titulo: String,
-    monto: Double, // Se recibe como Double
+    monto: Double,
     colorFondo: Color,
     colorTexto: Color,
     esIngreso: Boolean,
@@ -234,8 +236,8 @@ fun MovimientoItem(
 
 
 @Composable
-fun IngresoScreen(modifier: Modifier = Modifier) {
-    ListaIngresosScreen()
+fun IngresoScreen(navController: NavController, modifier: Modifier = Modifier) {
+    ListaIngresosScreen(navController = navController)
 }
 
 @Composable

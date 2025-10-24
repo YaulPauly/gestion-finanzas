@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -107,8 +108,10 @@ fun AppNavigation() {
             startDestination = AppScreen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = AppScreen.Home.route) { HomeScreen() }
-            composable(route = AppScreen.Ingreso.route) { IngresoScreen() }
+            composable(route = AppScreen.Home.route) { HomeScreen(navController = navController) }
+            composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen() }
+            //composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastos()}
+            composable(route = AppScreen.Ingreso.route) { IngresoScreen(navController = navController) }
             composable(route = AppScreen.Gastos.route) { GastosScreen() }
             composable(route = AppScreen.Movimientos.route) { MovimientosScreen() }
         }
