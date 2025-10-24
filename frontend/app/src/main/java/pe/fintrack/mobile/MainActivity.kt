@@ -109,7 +109,7 @@ fun AppNavigation() {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = AppScreen.Home.route) { HomeScreen(navController = navController) }
-            composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen() }
+            composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen(onNavigateBack = {navController.popBackStack()}) }
             //composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastos()}
             composable(route = AppScreen.Ingreso.route) { IngresoScreen(navController = navController) }
             composable(route = AppScreen.Gastos.route) { GastosScreen() }
