@@ -74,7 +74,7 @@ fun AppNavigation() {
                                     AppScreen.ListaIngreso -> Icons.Default.Add
                                     AppScreen.ListaGastos -> Icons.Default.Edit
                                     AppScreen.ListaMovimientos -> Icons.Default.MoreVert
-                                    else -> Icons.Default.Home // Un ícono por defecto
+                                    else -> Icons.Default.Home
                                 },
                                 contentDescription = screen.route
                             )

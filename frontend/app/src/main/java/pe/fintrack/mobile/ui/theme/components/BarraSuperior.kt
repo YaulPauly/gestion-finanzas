@@ -74,7 +74,7 @@ fun FinTrackTopBar(
     )
 }
 
-@Preview(showBackground = true) // showBackground = true añade un fondo blanco
+@Preview(showBackground = true) 
 @Composable
 fun FinTrackTopBarPreview() {
     // Envuelve el componente en tu tema para ver los estilos correctos
