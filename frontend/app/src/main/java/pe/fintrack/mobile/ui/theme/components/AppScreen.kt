@@ -1,14 +1,16 @@
 package pe.fintrack.mobile.ui.theme.components
 
-// ? sealed class es una clase que solo puede ser extendida
-// ? dentro del archivo en el que se encuentra
-sealed class AppScreen(val route: String){
-    object Home: AppScreen("home_screen")
+sealed class AppScreen(val route: String, val title: String) {
+    object Home : AppScreen("home", "Inicio")
+    object Ingreso : AppScreen("lista_ingresos", "Ingresos")
 
-    object RegistrarIngreso: AppScreen("registrar_ingreso_screen")
+    object RegistrarIngreso: AppScreen("registrar_ingresos", "Registrar Ingreso")
+    object EditarIngreso: AppScreen("editar_ingresos", "Editar Ingreso")
 
-    object RegistrarGasto: AppScreen("registrar_gasto_screen")
-    object ListaIngreso: AppScreen("lista_ingreso_screen")
-    object ListaGastos: AppScreen("lista_gastos_screen")
-    object ListaMovimientos: AppScreen("lista_movimientos_screen")
+
+    object RegistrarGastos: AppScreen("registrar_gastos", "Registrar Gastos")
+    object EditarGastos: AppScreen("editar_gastos", "Editar Gastos")
+
+    object Gastos : AppScreen("lista_gastos", "Gastos")
+    object Movimientos : AppScreen("movimientos", "Movimientos")
 }
