@@ -2,10 +2,9 @@ package pe.fintrack.mobile.ui.theme.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,14 +24,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(Color(0xFFF0F0F0)) // Un color de fondo suave para toda la pantalla
+            .background(Color(0xFFF0F0F0))
     ) {
         Box(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFF4A55A2)) // Un color sólido es más limpio que el degradado
+                .background(Color(0xFF4A55A2))
         ) {
             SaldoActualComponent(
                 saldoActual = 4500.50,
@@ -52,9 +50,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp) // Espacio entre las tarjetas
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // ✅ CORRECCIÓN: Se pasa el monto como Double
+
             ResumenCard(
                 titulo = "Ingresos",
                 monto = 4500.00,
@@ -63,7 +61,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 esIngreso = true,
                 modifier = Modifier.weight(1f)
             )
-            // ✅ CORRECCIÓN: Se pasa el monto como Double
+
             ResumenCard(
                 titulo = "Gastos",
                 monto = 450.00,
@@ -84,31 +82,75 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .weight(1f),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column {
-                MovimientoItem(
-                    categoria = "Trabajo",
-                    fecha = "24 Ago 2025 13:54 PM",
-                    monto = "+ S/. 1,500.00",
-                    esIngreso = true
-                )
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
-                MovimientoItem(
-                    categoria = "Supermercado",
-                    fecha = "23 Ago 2025 10:30 AM",
-                    monto = "- S/. 120.50",
-                    esIngreso = false
-                )
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
-                MovimientoItem(
-                    categoria = "Freelance",
-                    fecha = "22 Ago 2025 08:00 PM",
-                    monto = "+ S/. 800.00",
-                    esIngreso = true
-                )
+
+            LazyColumn {
+                item {
+                    MovimientoItem(
+                        categoria = "Trabajo",
+                        fecha = "24 Ago 2025 13:54 PM",
+                        monto = "+ S/. 1,500.00",
+                        esIngreso = true
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Supermercado",
+                        fecha = "23 Ago 2025 10:30 AM",
+                        monto = "- S/. 120.50",
+                        esIngreso = false
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Freelance",
+                        fecha = "22 Ago 2025 08:00 PM",
+                        monto = "+ S/. 800.00",
+                        esIngreso = true
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Freelance",
+                        fecha = "22 Ago 2025 08:00 PM",
+                        monto = "+ S/. 800.00",
+                        esIngreso = true
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Freelance",
+                        fecha = "22 Ago 2025 08:00 PM",
+                        monto = "+ S/. 800.00",
+                        esIngreso = true
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Freelance",
+                        fecha = "22 Ago 2025 08:00 PM",
+                        monto = "+ S/. 800.00",
+                        esIngreso = true
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
+                item {
+                    MovimientoItem(
+                        categoria = "Freelance",
+                        fecha = "22 Ago 2025 08:00 PM",
+                        monto = "+ S/. 800.00",
+                        esIngreso = true
+                    )
+                }
             }
         }
     }
@@ -146,7 +188,7 @@ fun ResumenCard(
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            // ✅ CORRECCIÓN: Se formatea el Double a un String con formato de moneda.
+
             Text(
                 text = "S/. ${String.format(Locale.US, "%,.2f", monto)}",
                 color = colorTexto,
@@ -190,11 +232,10 @@ fun MovimientoItem(
     }
 }
 
-// --- Otras Pantallas (Placeholder) ---
 
 @Composable
 fun IngresoScreen(modifier: Modifier = Modifier) {
-    Text(text = "Bienvenido a la pantalla de Ingresos!")
+    ListaIngresosScreen()
 }
 
 @Composable

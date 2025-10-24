@@ -3,6 +3,7 @@ package pe.fintrack.mobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,7 +29,7 @@ import pe.fintrack.mobile.ui.theme.screen.*
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // enableEdgeToEdge() // Puedes descomentar esto si manejas los insets manualmente
+        enableEdgeToEdge()
         setContent {
             FintrackMobileTheme {
                 AppNavigation()
@@ -46,17 +47,16 @@ fun AppNavigation() {
 
     val navigationItems = listOf(
         AppScreen.Home,
-        AppScreen.ListaIngreso,
-        AppScreen.ListaGastos,
-        AppScreen.ListaMovimientos
+        AppScreen.Ingreso,
+        AppScreen.Gastos,
+        AppScreen.Movimientos
     )
 
     Scaffold(
         topBar = {
-            // La barra superior solo aparece en la pantalla de inicio
             if (currentDestination?.route == AppScreen.Home.route) {
                 FinTrackTopBar(
-                    nombreUsuario = "Franco Peralta", // Eventualmente, esto vendría de un ViewModel
+                    nombreUsuario = "Franco Peralta",
                     onNotificationClick = { /* TODO: Implementar navegación a notificaciones */ }
                 )
             }
@@ -66,22 +66,24 @@ fun AppNavigation() {
                 navigationItems.forEach { screen ->
                     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     NavigationBarItem(
-                        // ✅ SECCIÓN DE ÍCONOS AÑADIDA
                         icon = {
                             Icon(
                                 imageVector = when (screen) {
                                     AppScreen.Home -> Icons.Default.Home
-                                    AppScreen.ListaIngreso -> Icons.Default.Add
-                                    AppScreen.ListaGastos -> Icons.Default.Edit
-                                    AppScreen.ListaMovimientos -> Icons.Default.MoreVert
-                                    else -> Icons.Default.Home // Un ícono por defecto
+                                    AppScreen.Ingreso -> Icons.Default.Add
+                                    AppScreen.Gastos -> Icons.Default.Edit
+                                    AppScreen.Movimientos -> Icons.Default.MoreVert
+                                    AppScreen.EditarGastos -> TODO()
+                                    AppScreen.EditarIngreso -> TODO()
+                                    AppScreen.RegistrarGastos -> TODO()
+                                    AppScreen.RegistrarIngreso -> TODO()
                                 },
-                                contentDescription = screen.route
+                                contentDescription = screen.title
                             )
                         },
                         label = {
                             Text(
-                                text = screen.route.split("_")[0].replaceFirstChar { it.uppercase() },
+                                text = screen.title,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                             )
                         },
@@ -105,18 +107,10 @@ fun AppNavigation() {
             startDestination = AppScreen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = AppScreen.Home.route) {
-                HomeScreen()
-            }
-            composable(route = AppScreen.ListaIngreso.route) {
-                IngresoScreen()
-            }
-            composable(route = AppScreen.ListaGastos.route) {
-                GastosScreen()
-            }
-            composable(route = AppScreen.ListaMovimientos.route) {
-                MovimientosScreen()
-            }
+            composable(route = AppScreen.Home.route) { HomeScreen() }
+            composable(route = AppScreen.Ingreso.route) { IngresoScreen() }
+            composable(route = AppScreen.Gastos.route) { GastosScreen() }
+            composable(route = AppScreen.Movimientos.route) { MovimientosScreen() }
         }
     }
 }
