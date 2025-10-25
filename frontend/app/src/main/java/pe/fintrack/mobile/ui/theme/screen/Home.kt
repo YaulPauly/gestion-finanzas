@@ -27,7 +27,7 @@ import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
 import pe.fintrack.mobile.ui.viewmodel.HomeViewModel
 import java.util.Locale
 import pe.fintrack.mobile.data.model.HomeUiState
-
+import pe.fintrack.mobile.ui.theme.components.BottomNavigationBar
 
 
 @Composable
@@ -39,24 +39,17 @@ fun HomeScreen(
 
     val state by viewModel.uiState.collectAsState()
 
-    // 🔑 USAMOS SCAFFOLD EN EL NIVEL SUPERIOR
+    // USAMOS SCAFFOLD EN EL NIVEL SUPERIOR
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             FinTrackTopBar(
-                nombreUsuario = "Franco Peralta",
+                nombreUsuario = state.nombreUsuario,
                 onNotificationClick = { /* Implementar lógica de notificaciones */ }
             )
         },
         bottomBar = {
-            // Ejemplo de BottomBar. Reemplazar con tu componente real.
-            Text(
-                text = "Barra de Navegación Inferior Aquí",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray)
-                    .padding(8.dp)
-            )
+            BottomNavigationBar(navController = navController)
         }
     ) { paddingValues ->
         // 2. LLAMAMOS A HOMECONTENT DENTRO DEL SCAFFOLD, APLICANDO EL PADDING
