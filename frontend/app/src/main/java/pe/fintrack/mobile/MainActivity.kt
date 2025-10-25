@@ -110,7 +110,7 @@ fun AppNavigation() {
         ) {
             composable(route = AppScreen.Home.route) { HomeScreen(navController = navController) }
             composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen(onNavigateBack = {navController.popBackStack()}) }
-            //composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastos()}
+            composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastosScreen(navController = navController)}
             composable(route = AppScreen.Ingreso.route) { IngresoScreen(navController = navController) }
             composable(route = AppScreen.Gastos.route) { GastosScreen() }
             composable(route = AppScreen.Movimientos.route) { MovimientosScreen() }
