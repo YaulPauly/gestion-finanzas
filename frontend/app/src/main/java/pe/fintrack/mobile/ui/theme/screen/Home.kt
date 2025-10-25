@@ -3,6 +3,7 @@ package pe.fintrack.mobile.ui.theme.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,153 +11,154 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
+import pe.fintrack.mobile.ui.theme.components.FinTrackTopBar
 import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
+import pe.fintrack.mobile.ui.viewmodel.HomeViewModel
 import java.util.Locale
+import pe.fintrack.mobile.data.model.HomeUiState
+
+
 
 @Composable
-fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF0F0F0))
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
+) {
+
+    val state by viewModel.uiState.collectAsState()
+
+    // 🔑 USAMOS SCAFFOLD EN EL NIVEL SUPERIOR
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            FinTrackTopBar(
+                nombreUsuario = "Franco Peralta",
+                onNotificationClick = { /* Implementar lógica de notificaciones */ }
+            )
+        },
+        bottomBar = {
+            // Ejemplo de BottomBar. Reemplazar con tu componente real.
+            Text(
+                text = "Barra de Navegación Inferior Aquí",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.LightGray)
+                    .padding(8.dp)
+            )
+        }
+    ) { paddingValues ->
+        // 2. LLAMAMOS A HOMECONTENT DENTRO DEL SCAFFOLD, APLICANDO EL PADDING
+        HomeContent(
+            state = state,
+            navController = navController,
+            // Aplicar el padding del Scaffold al contenido
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+
+    // Opcional: Mostrar error y carga
+    if (state.errorMessage != null) { /* ... */ }
+    if (state.isLoading) { /* ... */ }
+}
+
+
+@Composable
+    fun HomeContent(
+        state: HomeUiState,
+        navController: NavController,
+        modifier: Modifier = Modifier
     ) {
-        Box(
-            modifier = Modifier
-                .padding(8.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFF4A55A2))
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color(0xFFF0F0F0))
         ) {
-            SaldoActualComponent(
-                saldoActual = 4500.50,
-                onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
-                onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
+            // --- SALDO ACTUAL ---
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color(0xFF4A55A2))
+            ) {
+                SaldoActualComponent(
+                    saldoActual = state.saldoActual,
+                    onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
+                    onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
+                )
+            }
+
+            // --- RESUMEN MENSUAL ---
+            Text(
+                text = "Resumen Mensual",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
             )
-        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ResumenCard(
+                    titulo = "Ingresos",
+                    monto = state.resumen.ingresos,
+                    colorFondo = Color(0xFF4A55A2),
+                    colorTexto = Color.White,
+                    esIngreso = true,
+                    modifier = Modifier.weight(1f)
+                )
+                ResumenCard(
+                    titulo = "Gastos",
+                    monto = state.resumen.gastos,
+                    colorFondo = Color.White,
+                    colorTexto = Color.Black,
+                    esIngreso = false,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
-        // --- RESUMEN MENSUAL ---
-        Text(
-            text = "Resumen Mensual",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            ResumenCard(
-                titulo = "Ingresos",
-                monto = 4500.00,
-                colorFondo = Color(0xFF4A55A2),
-                colorTexto = Color.White,
-                esIngreso = true,
-                modifier = Modifier.weight(1f)
+            // --- MOVIMIENTOS RECIENTES ---
+            Text(
+                text = "Movimientos recientes",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
             )
-
-            ResumenCard(
-                titulo = "Gastos",
-                monto = 450.00,
-                colorFondo = Color.White,
-                colorTexto = Color.Black,
-                esIngreso = false,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        // --- MOVIMIENTOS RECIENTES ---
-        Text(
-            text = "Movimientos recientes",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
-        )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .weight(1f),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-
-            LazyColumn {
-                item {
-                    MovimientoItem(
-                        categoria = "Trabajo",
-                        fecha = "24 Ago 2025 13:54 PM",
-                        monto = "+ S/. 1,500.00",
-                        esIngreso = true
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Supermercado",
-                        fecha = "23 Ago 2025 10:30 AM",
-                        monto = "- S/. 120.50",
-                        esIngreso = false
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Freelance",
-                        fecha = "22 Ago 2025 08:00 PM",
-                        monto = "+ S/. 800.00",
-                        esIngreso = true
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Freelance",
-                        fecha = "22 Ago 2025 08:00 PM",
-                        monto = "+ S/. 800.00",
-                        esIngreso = true
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Freelance",
-                        fecha = "22 Ago 2025 08:00 PM",
-                        monto = "+ S/. 800.00",
-                        esIngreso = true
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Freelance",
-                        fecha = "22 Ago 2025 08:00 PM",
-                        monto = "+ S/. 800.00",
-                        esIngreso = true
-                    )
-                }
-                item { Divider(modifier = Modifier.padding(horizontal = 16.dp)) }
-                item {
-                    MovimientoItem(
-                        categoria = "Freelance",
-                        fecha = "22 Ago 2025 08:00 PM",
-                        monto = "+ S/. 800.00",
-                        esIngreso = true
-                    )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .weight(1f),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                LazyColumn {
+                    items(state.movimientosRecientes) { movimiento ->
+                        MovimientoItem(
+                            categoria = movimiento.categoria,
+                            fecha = movimiento.fecha,
+                            monto = if (movimiento.esIngreso) "+ S/. ${String.format(Locale.US, "%,.2f", movimiento.monto)}" else "- S/. ${String.format(Locale.US, "%,.2f", movimiento.monto)}",
+                            esIngreso = movimiento.esIngreso
+                        )
+                        Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                    }
                 }
             }
         }
     }
-}
 
 @Composable
 fun ResumenCard(

@@ -1,6 +1,10 @@
 package pe.fintrack.mobile.ui.theme.components
 
 sealed class AppScreen(val route: String, val title: String) {
+
+    object Login : AppScreen("login_screen", "Iniciar Sesión")
+    object MainContent : AppScreen("main_content", "Contenido Principal")
+
     object Home : AppScreen("home", "Inicio")
     object Ingreso : AppScreen("lista_ingresos", "Ingresos")
 

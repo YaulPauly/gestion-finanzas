@@ -20,10 +20,7 @@ class MetaViewModel (
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
-
-    // Opcional: Si el ID del usuario es estático o se pasa en el constructor, úsalo aquí.
-    // Si el ID del usuario cambia, deberás manejarlo con una función pública de carga.
-    private val currentUserId = 1 // Reemplaza con la lógica real para obtener el ID del usuario.
+    private val currentUserId = 1
 
     init {
         collectAllMetas(currentUserId)

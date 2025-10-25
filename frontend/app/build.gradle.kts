@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    // id("com.google.devtools.ksp") version "2.1.0-1.0.29"
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 }
 
 android {
@@ -73,10 +75,18 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    // Hilt para Android
+    implementation("com.google.dagger:hilt-android:2.48.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.48.1")
+
+    // *** ESTA ES LA CLAVE PARA hiltViewModel() ***
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 }

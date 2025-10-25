@@ -2,14 +2,17 @@ package pe.fintrack.mobile.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import pe.fintrack.mobile.data.local.entity.UsuarioEntity
 import pe.fintrack.mobile.data.repository.UsuarioRepository
+import javax.inject.Inject
 
-class UsuarioViewModel (private val repository: UsuarioRepository
+@HiltViewModel
+class UsuarioViewModel @Inject constructor(private val repository: UsuarioRepository
 ) : ViewModel() {
     private val _usuarioActual = MutableStateFlow<UsuarioEntity?>(null)
     val usuarioActual: StateFlow<UsuarioEntity?> = _usuarioActual.asStateFlow()
