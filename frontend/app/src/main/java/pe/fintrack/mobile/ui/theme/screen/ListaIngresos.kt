@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import pe.fintrack.mobile.ui.theme.components.AppScreen // Importa tu sealed class
+import pe.fintrack.mobile.ui.theme.components.AppScreen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

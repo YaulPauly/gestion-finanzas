@@ -39,7 +39,7 @@ fun LoginScreen(
     viewModel: UsuarioViewModel = hiltViewModel() // Inyección del ViewModel
 ) {
     // 1. Estados de la UI
-    var email by remember { mutableStateOf("usuario@ejemplo.com") } // Valores pre-llenados para fácil prueba
+    var email by remember { mutableStateOf("usuario@ejemplo.com") }
     var password by remember { mutableStateOf("123") }
 
     // Observar el estado de carga y el mensaje

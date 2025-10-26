@@ -46,14 +46,6 @@ fun MainContentNavGraph(navControllerRaiz: NavController) {
     )
 
     Scaffold(
-        topBar = {
-            if (currentDestination?.route == AppScreen.Home.route) {
-                FinTrackTopBar(
-                    nombreUsuario = "Franco Peralta",
-                    onNotificationClick = { /* TODO: Implementar navegación a notificaciones */ }
-                )
-            }
-        },
         bottomBar = {
             NavigationBar {
                 navigationItems.forEach { screen ->

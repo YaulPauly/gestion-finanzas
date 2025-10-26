@@ -30,15 +30,8 @@ fun AppNavHost() {
 
         // 2. Ruta Contenedora del Home
         composable(AppScreen.Home.route) {
-            HomeScreen(navController = navController)
+            MainContentNavGraph(navControllerRaiz = navController)
         }
-        // Pantallas principales de la barra inferior
-        composable(AppScreen.Home.route) { HomeScreen(navController = navController) }
-        //composable(AppScreen.Movimientos.route) { MovimientosScreen(navController = navController) }
-
-        // Pantallas de registro (las que estás usando en la barra)
-        //composable(AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen (navController = navController) }
-        composable(AppScreen.RegistrarGastos.route) { RegistrarGastosScreen(navController = navController) }
 
     }
 }

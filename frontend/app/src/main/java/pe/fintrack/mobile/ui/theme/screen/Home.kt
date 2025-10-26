@@ -38,29 +38,20 @@ fun HomeScreen(
 ) {
 
     val state by viewModel.uiState.collectAsState()
+    Column(modifier = modifier.fillMaxSize()) {
+        // 1. TopBar con nombre dinámico
+        FinTrackTopBar(
+            nombreUsuario = state.nombreUsuario,
+            onNotificationClick = { /* ... */ }
+        )
 
-    // USAMOS SCAFFOLD EN EL NIVEL SUPERIOR
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            FinTrackTopBar(
-                nombreUsuario = state.nombreUsuario,
-                onNotificationClick = { /* Implementar lógica de notificaciones */ }
-            )
-        },
-        bottomBar = {
-            BottomNavigationBar(navController = navController)
-        }
-    ) { paddingValues ->
         // 2. LLAMAMOS A HOMECONTENT DENTRO DEL SCAFFOLD, APLICANDO EL PADDING
         HomeContent(
             state = state,
             navController = navController,
-            // Aplicar el padding del Scaffold al contenido
-            modifier = Modifier.padding(paddingValues)
+            modifier = modifier.fillMaxSize()
         )
     }
-
     // Opcional: Mostrar error y carga
     if (state.errorMessage != null) { /* ... */ }
     if (state.isLoading) { /* ... */ }
