@@ -7,10 +7,10 @@ sealed class AppScreen(val route: String, val title: String) {
     object RegistrarIngreso: AppScreen("registrar_ingresos", "Registrar Ingreso")
     object EditarIngreso: AppScreen("editar_ingresos", "Editar Ingreso")
 
-
+    object Gastos : AppScreen("lista_gastos", "Gastos")
     object RegistrarGastos: AppScreen("registrar_gastos", "Registrar Gastos")
     object EditarGastos: AppScreen("editar_gastos", "Editar Gastos")
 
-    object Gastos : AppScreen("lista_gastos", "Gastos")
+
     object Movimientos : AppScreen("movimientos", "Movimientos")
 }

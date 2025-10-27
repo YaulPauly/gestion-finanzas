@@ -241,8 +241,8 @@ fun IngresoScreen(navController: NavController, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GastosScreen(modifier: Modifier = Modifier) {
-    Text(text = "Bienvenido a la pantalla de Gastos!")
+fun GastosScreen(navController: NavController,modifier: Modifier = Modifier) {
+    ListaGastosScreen(navController = navController)
 }
 
 @Composable

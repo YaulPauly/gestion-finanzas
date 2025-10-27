@@ -4,7 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -13,8 +17,13 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -63,29 +72,38 @@ fun AppNavigation() {
             }
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar (containerColor = Color(0xFF3C467B)){
                 navigationItems.forEach { screen ->
                     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                     NavigationBarItem(
                         icon = {
-                            Icon(
-                                imageVector = when (screen) {
-                                    AppScreen.Home -> Icons.Default.Home
-                                    AppScreen.Ingreso -> Icons.Default.Add
-                                    AppScreen.Gastos -> Icons.Default.Edit
-                                    AppScreen.Movimientos -> Icons.Default.MoreVert
-                                    AppScreen.EditarGastos -> TODO()
-                                    AppScreen.EditarIngreso -> TODO()
-                                    AppScreen.RegistrarGastos -> TODO()
-                                    AppScreen.RegistrarIngreso -> TODO()
-                                },
-                                contentDescription = screen.title
+                            val iconoColor = if(isSelected) Color(0xFF3C467B) else Color(0xFFFFFFFF)
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(40.dp).clip(CircleShape).background(Color(0xFFFFFFF))
                             )
+                            {
+                                Icon(tint= iconoColor,
+                                    imageVector = when (screen) {
+                                        AppScreen.Home -> Icons.Default.Home
+                                        AppScreen.Ingreso -> Icons.Default.Add
+                                        AppScreen.Gastos -> Icons.Default.Edit
+                                        AppScreen.Movimientos -> Icons.Default.MoreVert
+                                        AppScreen.EditarGastos -> TODO()
+                                        AppScreen.EditarIngreso -> TODO()
+                                        AppScreen.RegistrarGastos -> TODO()
+                                        AppScreen.RegistrarIngreso -> TODO()
+                                    },
+                                    contentDescription = screen.title
+                                )
+
+                            }
                         },
                         label = {
                             Text(
                                 text = screen.title,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                color = Color(0xFFFFFFFF)
                             )
                         },
                         selected = isSelected,
@@ -110,9 +128,9 @@ fun AppNavigation() {
         ) {
             composable(route = AppScreen.Home.route) { HomeScreen(navController = navController) }
             composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen(onNavigateBack = {navController.popBackStack()}) }
-            composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastosScreen(navController = navController)}
+            composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastosScreen(navController/* = navController.popBackStack()*/)}
             composable(route = AppScreen.Ingreso.route) { IngresoScreen(navController = navController) }
-            composable(route = AppScreen.Gastos.route) { GastosScreen() }
+            composable(route = AppScreen.Gastos.route) { GastosScreen(navController = navController,modifier = Modifier) }
             composable(route = AppScreen.Movimientos.route) { MovimientosScreen() }
         }
     }

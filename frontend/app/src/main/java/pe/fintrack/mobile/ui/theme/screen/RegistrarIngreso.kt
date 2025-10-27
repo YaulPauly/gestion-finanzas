@@ -1,137 +1,156 @@
 package pe.fintrack.mobile.ui.theme.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrarIngresoScreen(onNavigateBack: () -> Unit) {
     // Estados para cada campo del formulario
-    var titulo by remember { mutableStateOf("") }
     var monto by remember { mutableStateOf("") }
-    var fechaSeleccionada by remember { mutableStateOf<Date?>(null) }
-    val showDatePicker = remember { mutableStateOf(false) }
+    var categoria by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val categorias = listOf("Salario", "Ventas", "Bonos", "Regalo", "Otros") // Opciones de ejemplo
 
-    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Registrar Ingreso") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Regresar"
-                        )
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // --- Navegación "Volver" ---
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues) // Aplica el padding del Scaffold
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
+                .clickable(onClick = onNavigateBack),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // El título ahora está en la TopAppBar, por lo que se elimina de aquí.
-
-            // Campo para el Título
-            OutlinedTextField(
-                value = titulo,
-                onValueChange = { titulo = it },
-                label = { Text("Título del movimiento") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Volver",
+                modifier = Modifier.size(20.dp)
             )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Volver")
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo para el Monto
-            OutlinedTextField(
-                value = monto,
-                onValueChange = { monto = it },
-                label = { Text("Monto (S/.)") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
-            )
+        // --- Título ---
+        Text(
+            text = "Registrar Ingreso",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-            // Campo para la Fecha (abre un Date Picker)
-            OutlinedTextField(
-                value = fechaSeleccionada?.let { dateFormatter.format(it) } ?: "",
-                onValueChange = { /* El valor se actualiza desde el DatePicker */ },
-                label = { Text("Fecha") },
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDatePicker.value = true },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Seleccionar fecha"
+        // --- Tarjeta del Formulario ---
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // --- Campo: Monto ---
+                Text(
+                    text = "Ingresar monto"
+                )
+                OutlinedTextField(
+                    value = monto,
+                    onValueChange = { monto = it },
+                    label = { Text("Ingresar monto") },
+                    placeholder = { Text("Monto") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+
+                // --- Campo: Categoría (Dropdown) ---
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = categoria,
+                        onValueChange = { /* No se cambia directamente */ },
+                        label = { Text("Ingresar categoria") },
+                        placeholder = { Text("Categoria") },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
                     )
-                }
-            )
-
-            // Diálogo del Date Picker
-            if (showDatePicker.value) {
-                val datePickerState = rememberDatePickerState()
-                DatePickerDialog(
-                    onDismissRequest = { showDatePicker.value = false },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                datePickerState.selectedDateMillis?.let {
-                                    fechaSeleccionada = Date(it)
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        categorias.forEach { item ->
+                            DropdownMenuItem(
+                                text = { Text(item) },
+                                onClick = {
+                                    categoria = item
+                                    expanded = false
                                 }
-                                showDatePicker.value = false
-                            }
-                        ) {
-                            Text("Aceptar")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDatePicker.value = false }) {
-                            Text("Cancelar")
+                            )
                         }
                     }
-                ) {
-                    DatePicker(state = datePickerState)
                 }
-            }
 
-            Spacer(modifier = Modifier.weight(1f)) // Empuja el botón hacia abajo
+                // --- Campo: Descripción ---
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { descripcion = it },
+                    label = { Text("Ingresar descripción") },
+                    placeholder = { Text("Descripción (Opcional)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(130.dp), // Altura para el campo de descripción
+                    singleLine = false
+                )
 
-            // Botón para guardar
-            Button(
-                onClick = {
-                    // TODO: Lógica para guardar el ingreso.
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            ) {
-                Text("Guardar Ingreso")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- Botón: Registrar ---
+                Button(
+                    onClick = {
+                        // TODO: Lógica para registrar el ingreso.
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF483D8B) // Color azul/púrpura oscuro
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Registrar")
+                }
             }
         }
     }
