@@ -31,29 +31,29 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import pe.fintrack.mobile.ui.theme.components.AppScreen
-import pe.fintrack.mobile.ui.viewmodel.UsuarioViewModel
+import pe.fintrack.mobile.ui.viewmodel.AuthUiState
+import pe.fintrack.mobile.ui.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: UsuarioViewModel = hiltViewModel() // Inyección del ViewModel
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
     // 1. Estados de la UI
     var email by remember { mutableStateOf("usuario@ejemplo.com") }
     var password by remember { mutableStateOf("123") }
 
-    // Observar el estado de carga y el mensaje
-    val isLoading by viewModel.isLoading.collectAsState()
-    val message by viewModel.message.collectAsState()
+    // CAMBIO CLAVE 2: Observar el NUEVO estado de autenticación
+    val authState by viewModel.uiState.collectAsState()
 
-    // Observar el usuario actual (la clave para la navegación)
-    val usuarioActual by viewModel.usuarioActual.collectAsState()
 
-    // 2. Efecto para la Navegación (Una vez que el usuario inicia sesión)
-    LaunchedEffect (usuarioActual) {
-        if (usuarioActual != null) {
-            // Navega a la pantalla Home.
-            navController.navigate(AppScreen.Home.route) {
+
+    // 2. Efecto para la Navegación y Manejo de Errores
+    LaunchedEffect(authState) {
+        if (authState is AuthUiState.Success) {
+            // Mueve el usuario al contenido principal
+            navController.navigate(AppScreen.MainContent.route) {
+                // Limpia la pila de navegación para que el usuario no pueda volver al login con el botón 'atrás'
                 popUpTo(AppScreen.Login.route) { inclusive = true }
             }
         }
@@ -88,31 +88,24 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button (
-            onClick = { viewModel.iniciarSesion(email, password) },
-            enabled = !isLoading,
+            onClick = { viewModel.login(email, password) },
+            enabled = authState != AuthUiState.Loading,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (isLoading) {
+            if (authState == AuthUiState.Loading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
                 Text("Entrar")
             }
         }
 
-        // Muestra el mensaje de error o éxito
-        message?.let {
+        // Mostrar errores directamente del estado AuthUiState.Error
+        (authState as? AuthUiState.Error)?.let { errorState ->
             Text(
-                text = it,
-                color = if (usuarioActual != null) Color.Green.copy(alpha = 0.8f) else Color.Red,
+                text = errorState.message, // Muestra el mensaje del error
+                color = Color.Red,
                 modifier = Modifier.padding(top = 16.dp)
             )
-            // Llama a clearMessage() después de un breve periodo si es un error
-            LaunchedEffect(it) {
-                if (usuarioActual == null) {
-                    delay(3000)
-                    viewModel.clearMessage()
-                }
-            }
         }
     }
 }

@@ -5,11 +5,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
-import pe.fintrack.mobile.ui.theme.screen.HomeScreen
 import pe.fintrack.mobile.ui.theme.screen.LoginScreen
-import pe.fintrack.mobile.ui.theme.screen.MovimientosScreen
-import pe.fintrack.mobile.ui.theme.screen.RegistrarGastosScreen
-import pe.fintrack.mobile.ui.theme.screen.RegistrarIngresoScreen
+
 
 @Composable
 fun AppNavHost() {
@@ -28,8 +25,9 @@ fun AppNavHost() {
             LoginScreen(navController = navController)
         }
 
-        // 2. Ruta Contenedora del Home
-        composable(AppScreen.Home.route) {
+        // RUTA DEL CONTENIDO PRINCIPAL
+        composable(route = AppScreen.MainContent.route) {
+            // Esto lleva a la pantalla con el Scaffold, BottomBar, etc.
             MainContentNavGraph(navControllerRaiz = navController)
         }
 

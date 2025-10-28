@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -27,7 +28,6 @@ import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
 import pe.fintrack.mobile.ui.viewmodel.HomeViewModel
 import java.util.Locale
 import pe.fintrack.mobile.data.model.HomeUiState
-import pe.fintrack.mobile.ui.theme.components.BottomNavigationBar
 
 
 @Composable
@@ -38,111 +38,146 @@ fun HomeScreen(
 ) {
 
     val state by viewModel.uiState.collectAsState()
-    Column(modifier = modifier.fillMaxSize()) {
-        // 1. TopBar con nombre dinámico
-        FinTrackTopBar(
-            nombreUsuario = state.nombreUsuario,
-            onNotificationClick = { /* ... */ }
-        )
 
-        // 2. LLAMAMOS A HOMECONTENT DENTRO DEL SCAFFOLD, APLICANDO EL PADDING
-        HomeContent(
-            state = state,
-            navController = navController,
-            modifier = modifier.fillMaxSize()
-        )
+    Box(modifier = modifier.fillMaxSize()) {
+
+        // 1. Manejo del estado de carga
+        if (state.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(48.dp)
+                    .align(Alignment.Center)
+            )
+        }
+        // 2. Manejo del estado de error
+        else if (state.errorMessage != null) {
+            Text(
+                text = state.errorMessage ?: "Error desconocido al cargar datos.",
+                color = Color.Red,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(horizontal = 32.dp)
+            )
+        }
+        // 3. Mostrar contenido normal (sólo si no hay error y no está cargando)
+        else {
+            Column(modifier = Modifier.fillMaxSize()) {
+                // TopBar
+                FinTrackTopBar(
+                    nombreUsuario = state.nombreUsuario,
+                    onNotificationClick = { /* ... */ }
+                )
+
+                // Contenido principal (HomeContent)
+                HomeContent(
+                    state = state,
+                    navController = navController,
+                    modifier = modifier
+                        .fillMaxSize()
+                        .weight(1f) // Esto permite que el contenido principal ocupe el espacio restante
+                )
+            }
+        }
+        // Opcional: Mostrar error y carga
+        if (state.errorMessage != null) { /* ... */
+        }
+        if (state.isLoading) { /* ... */
+        }
     }
-    // Opcional: Mostrar error y carga
-    if (state.errorMessage != null) { /* ... */ }
-    if (state.isLoading) { /* ... */ }
 }
 
-
 @Composable
-    fun HomeContent(
-        state: HomeUiState,
-        navController: NavController,
-        modifier: Modifier = Modifier
+fun HomeContent(
+    state: HomeUiState,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFF0F0F0))
     ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .background(Color(0xFFF0F0F0))
+        // --- SALDO ACTUAL ---
+        Box(
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFF4A55A2))
         ) {
-            // --- SALDO ACTUAL ---
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFF4A55A2))
-            ) {
-                SaldoActualComponent(
-                    saldoActual = state.saldoActual,
-                    onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
-                    onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
-                )
-            }
-
-            // --- RESUMEN MENSUAL ---
-            Text(
-                text = "Resumen Mensual",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+            SaldoActualComponent(
+                saldoActual = state.saldoActual,
+                onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
+                onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ResumenCard(
-                    titulo = "Ingresos",
-                    monto = state.resumen.ingresos,
-                    colorFondo = Color(0xFF4A55A2),
-                    colorTexto = Color.White,
-                    esIngreso = true,
-                    modifier = Modifier.weight(1f)
-                )
-                ResumenCard(
-                    titulo = "Gastos",
-                    monto = state.resumen.gastos,
-                    colorFondo = Color.White,
-                    colorTexto = Color.Black,
-                    esIngreso = false,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+        }
 
-            // --- MOVIMIENTOS RECIENTES ---
-            Text(
-                text = "Movimientos recientes",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+        // --- RESUMEN MENSUAL ---
+        Text(
+            text = "Resumen Mensual",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            ResumenCard(
+                titulo = "Ingresos",
+                monto = state.resumen.ingresos,
+                colorFondo = Color(0xFF4A55A2),
+                colorTexto = Color.White,
+                esIngreso = true,
+                modifier = Modifier.weight(1f)
             )
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                LazyColumn {
-                    items(state.movimientosRecientes) { movimiento ->
-                        MovimientoItem(
-                            categoria = movimiento.categoria,
-                            fecha = movimiento.fecha,
-                            monto = if (movimiento.esIngreso) "+ S/. ${String.format(Locale.US, "%,.2f", movimiento.monto)}" else "- S/. ${String.format(Locale.US, "%,.2f", movimiento.monto)}",
-                            esIngreso = movimiento.esIngreso
-                        )
-                        Divider(modifier = Modifier.padding(horizontal = 16.dp))
-                    }
+            ResumenCard(
+                titulo = "Gastos",
+                monto = state.resumen.gastos,
+                colorFondo = Color.White,
+                colorTexto = Color.Black,
+                esIngreso = false,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // --- MOVIMIENTOS RECIENTES ---
+        Text(
+            text = "Movimientos recientes",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
+        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .weight(1f),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            LazyColumn {
+                items(state.movimientosRecientes) { movimiento ->
+                    MovimientoItem(
+                        categoria = movimiento.categoria,
+                        fecha = movimiento.fecha,
+                        monto = if (movimiento.esIngreso) "+ S/. ${
+                            String.format(
+                                Locale.US,
+                                "%,.2f",
+                                movimiento.monto
+                            )
+                        }" else "- S/. ${String.format(Locale.US, "%,.2f", movimiento.monto)}",
+                        esIngreso = movimiento.esIngreso
+                    )
+                    Divider(modifier = Modifier.padding(horizontal = 16.dp))
                 }
             }
         }
     }
+}
 
 @Composable
 fun ResumenCard(
@@ -168,7 +203,11 @@ fun ResumenCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = titulo, color = colorTexto, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = titulo,
+                    color = colorTexto,
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Icon(
                     imageVector = if (esIngreso) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = titulo,
@@ -208,7 +247,11 @@ fun MovimientoItem(
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = categoria, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+            Text(
+                text = categoria,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold
+            )
             Text(text = fecha, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
         Text(
@@ -235,3 +278,4 @@ fun GastosScreen(modifier: Modifier = Modifier) {
 fun MovimientosScreen(modifier: Modifier = Modifier) {
     Text(text = "Bienvenido a la pantalla de Movimientos!")
 }
+

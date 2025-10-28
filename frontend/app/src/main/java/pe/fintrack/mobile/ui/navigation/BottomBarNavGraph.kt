@@ -13,9 +13,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,13 +32,18 @@ import pe.fintrack.mobile.ui.theme.screen.HomeScreen
 import pe.fintrack.mobile.ui.theme.screen.IngresoScreen
 import pe.fintrack.mobile.ui.theme.screen.MovimientosScreen
 import pe.fintrack.mobile.ui.theme.screen.RegistrarIngresoScreen
+import pe.fintrack.mobile.ui.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContentNavGraph(navControllerRaiz: NavController) {
+fun MainContentNavGraph(
+    navControllerRaiz: NavController,
+    homeViewModel: HomeViewModel = hiltViewModel()
+    ) {
     val navController = rememberNavController() // Este controlador gestionará SOLO la navegación interna (Home, Ingreso, Gastos)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val homeUiState by homeViewModel.uiState.collectAsState()
 
     val navigationItems = listOf(
         AppScreen.Home,
@@ -46,6 +53,15 @@ fun MainContentNavGraph(navControllerRaiz: NavController) {
     )
 
     Scaffold(
+        topBar = {
+            // Lógica de TopBar solo para la pantalla Home
+            if (currentDestination?.route == AppScreen.Home.route) {
+                FinTrackTopBar(
+                    nombreUsuario = homeUiState.nombreUsuario,
+                    onNotificationClick = { /* si hay notificaciones */ }
+                )
+            }
+        },
         bottomBar = {
             NavigationBar {
                 navigationItems.forEach { screen ->
@@ -54,17 +70,12 @@ fun MainContentNavGraph(navControllerRaiz: NavController) {
                         icon = {
                             Icon(
                                 imageVector = when (screen) {
-                                    AppScreen.Login -> TODO()
-                                    AppScreen.MainContent -> TODO()
+                                    // SOLO INCLUIMOS LAS RUTAS QUE ESTÁN EN navigationItems
                                     AppScreen.Home -> Icons.Default.Home
                                     AppScreen.Ingreso -> Icons.Default.Add
                                     AppScreen.Gastos -> Icons.Default.Edit
                                     AppScreen.Movimientos -> Icons.Default.MoreVert
-                                    AppScreen.EditarGastos -> TODO()
-                                    AppScreen.EditarIngreso -> TODO()
-                                    AppScreen.RegistrarGastos -> TODO()
-                                    AppScreen.RegistrarIngreso -> TODO()
-
+                                    else -> Icons.Default.Home
                                 },
                                 contentDescription = screen.title
                             )
@@ -95,9 +106,8 @@ fun MainContentNavGraph(navControllerRaiz: NavController) {
             startDestination = AppScreen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(route = AppScreen.Home.route) { HomeScreen(navController = navController) }
+            composable(route = AppScreen.Home.route) { HomeScreen(navController = navController, viewModel = homeViewModel) }
             composable(route = AppScreen.RegistrarIngreso.route) { RegistrarIngresoScreen(onNavigateBack = {navController.popBackStack()}) }
-            //composable(route = AppScreen.RegistrarGastos.route) { RegistrarGastos()}
             composable(route = AppScreen.Ingreso.route) { IngresoScreen(navController = navController) }
             composable(route = AppScreen.Gastos.route) { GastosScreen() }
             composable(route = AppScreen.Movimientos.route) { MovimientosScreen() }

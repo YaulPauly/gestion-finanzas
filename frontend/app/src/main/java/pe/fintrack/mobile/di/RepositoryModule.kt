@@ -5,9 +5,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import pe.fintrack.mobile.data.local.dao.UsuarioDao
+import pe.fintrack.mobile.data.remote.FintrackApiService
 import pe.fintrack.mobile.data.repository.HomeRepository
 import pe.fintrack.mobile.data.repository.HomeRepositoryImpl
 import pe.fintrack.mobile.data.repository.UsuarioRepository
+import pe.fintrack.mobile.data.repository.UsuarioRepositoryImpl
 import javax.inject.Singleton
 
 // (Dependency Injection)
@@ -17,14 +19,16 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideHomeRepository(): HomeRepository {
+    fun provideHomeRepository(apiService: FintrackApiService): HomeRepository {
         // Hilt usará esta implementación para satisfacer la dependencia de HomeRepository
-        return HomeRepositoryImpl()
+        return HomeRepositoryImpl(apiService)
     }
 
+    // 2. Provee la implementación de UsuarioRepository (Debe inyectar la API Service)
     @Provides
     @Singleton
-    fun provideUsuarioRepository(usuarioDao: UsuarioDao): UsuarioRepository {
-     return UsuarioRepository(usuarioDao)
+    fun provideUsuarioRepository(apiService: FintrackApiService): UsuarioRepository {
+        // Usamos UsuarioRepository (el del login)
+        return UsuarioRepositoryImpl(apiService)
     }
 }
