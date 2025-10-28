@@ -12,53 +12,67 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.size
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
+import pe.fintrack.mobile.ui.theme.data.Transaction
+import pe.fintrack.mobile.ui.theme.data.TransactionType
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// Clase de datos de ejemplo
-data class Gastos(val descripcion: String, val monto: Double, val fecha: String)
-
 @Composable
-fun ListaGastosScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun ListaGastosScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier
+    // expenseViewModel: ExpenseViewModel = viewModel() // <-- Así inyectarías el ViewModel
+) {
+    // --- ESTADO (Ejemplo de cómo sería con ViewModel) ---
+    // val expenseState by expenseViewModel.expenseListState.collectAsState()
+    // Aquí usamos datos de ejemplo por ahora, pero usando el modelo Transaction
+    val listaDeGastosEjemplo = listOf(
+        Transaction(1L, "2025-10-27", 120.50.toBigDecimal(), "Almuerzo oficina", TransactionType.EXPENSE, 1, null, 1, ""),
+        Transaction(2L, "2025-10-26", 80.00.toBigDecimal(), "Taxi", TransactionType.EXPENSE, 2, null, 1, "")
+    )
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF0F0F0))
             .padding(horizontal = 16.dp)
     ) {
-        // Título
         Text(
             text = "Gastos",
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 16.dp)
         )
-
         Spacer(modifier = Modifier.height(24.dp))
-
-        // Botones de acción
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Top
         ) {
-            CircleActionButton(
+            CircleActionButton( // <-- Nombre corregido
                 text = "Registrar\ngastos",
                 icon = Icons.Default.Add,
                 onClick = {
-                    navController.navigate(AppScreen.RegistrarIngreso.route)
+                    // ¡CORREGIDO! Debe navegar a RegistrarGastos
+                    navController.navigate(AppScreen.RegistrarGastos.route)
                 }
             )
             CircleActionButton(
@@ -70,69 +84,79 @@ fun ListaGastosScreen(navController: NavController, modifier: Modifier = Modifie
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Lista de Gastos
+        // --- Lista de Gastos (consumiendo el estado) ---
+        // Aquí puedes cambiar entre 'expenseState' (cuando tengas ViewModel)
+        // o 'listaDeGastosEjemplo' (para probar la UI)
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            /* TODO
-            *   val listaDeGastos = retrofit.getAllGastos()
-            *   items(listaDeGastos) { gastos ->
-            *       GastosItem(gastos)
-            *   }
-            * */
-
-            val listaDeGastos = (1..10).map {
-                Gastos(
-                    descripcion = "Trabajo",
-                    monto = 1500.00,
-                    fecha = SimpleDateFormat("dd MMM yyyy HH:mm:ss a", Locale("es", "ES")).format(Date())
+            items(listaDeGastosEjemplo) { gasto -> // 'gasto' AHORA ES DE TIPO 'Transaction'
+                GastosItem(
+                    gasto = gasto, // Pasa el objeto Transaction
+                    modifier = Modifier.clickable {
+                        // ¡CORREGIDO! Ahora 'gasto.id' existe
+                        navController.navigate(AppScreen.EditarGastos.route + "/${gasto.id}")
+                    }
                 )
-            }
-            items(listaDeGastos) { gastos ->
-                GastosItem(gastos)
             }
         }
     }
 }
 
 @Composable
-fun CircleActionGastosButton(
-    text: String,
-    icon: ImageVector,
+fun CircleActionButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    buttonText: String,
+    contentDescription: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    buttonSize: Dp = 64.dp,
+    iconSize: Dp = 32.dp,
+    circleColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    iconTint: Color = MaterialTheme.colorScheme.onPrimaryContainer
 ) {
     Column(
-        modifier = modifier.clickable(onClick = onClick),
+        // Use a more descriptive clickable modifier with a semantic role.
+        modifier = modifier.clickable(
+            onClick = onClick,
+            role = Role.Button,
+            onClickLabel = contentDescription
+        ),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(64.dp)
+                .size(buttonSize)
                 .clip(CircleShape)
-                .background(Color(0xFF4A4E69)),
+                .background(circleColor),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = text,
-                tint = Color.White,
-                modifier = Modifier.size(32.dp)
+                contentDescription = null, // Description is handled by the parent clickable modifier.
+                tint = iconTint,
+                modifier = Modifier.size(iconSize)
             )
         }
         Text(
-            text = text,
+            text = buttonText,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface // Use theme color for text.
         )
     }
 }
 
+// ¡MODIFICADO! Acepta 'Transaction' en lugar de 'Gastos'
 @Composable
-fun GastosItem(gastos: Gastos, modifier: Modifier = Modifier) {
+fun GastosItem(gasto: Transaction, modifier: Modifier = Modifier) {
+    // Formateador de moneda
+    val currencyFormatter =
+        remember { DecimalFormat("S/ #,##0.00", java.text.DecimalFormatSymbols(Locale("es", "PE"))) }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -154,21 +178,22 @@ fun GastosItem(gastos: Gastos, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = gastos.descripcion,
+                    text = gasto.description ?: "Gasto", // Usa la descripción
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = gastos.fecha,
+                    text = gasto.date, // Usa la fecha (puedes formatearla)
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
             }
             Text(
-                text = "- S/. ${String.format(Locale.US, "%,.2f", gastos.monto)}",
+                // Usa el 'amount' y formatea
+                text = "- ${currencyFormatter.format(gasto.amount)}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF821E1E)
+                color = Color(0xFF821E1E) // Rojo para gastos
             )
         }
     }

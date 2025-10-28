@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,17 +23,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen // Importa tu sealed class
+import pe.fintrack.mobile.ui.theme.data.Transaction
+import pe.fintrack.mobile.ui.theme.data.viewmodel.IncomeListUiState
+import pe.fintrack.mobile.ui.theme.data.viewmodel.IncomeViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 // Clase de datos de ejemplo
-data class Ingreso(val descripcion: String, val monto: Double, val fecha: String)
+
 
 @Composable
-fun ListaIngresosScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun ListaIngresosScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    incomeViewModel: IncomeViewModel = viewModel()
+){
+
+    val uiState by incomeViewModel.uiState.collectAsState()
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -70,20 +84,42 @@ fun ListaIngresosScreen(navController: NavController, modifier: Modifier = Modif
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Lista de ingresos
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val listaDeIngresos = (1..10).map {
-                Ingreso(
-                    descripcion = "Trabajo",
-                    monto = 1500.00,
-                    fecha = SimpleDateFormat("dd MMM yyyy HH:mm:ss a", Locale("es", "ES")).format(Date())
-                )
+        when (val state = uiState) {
+            is IncomeListUiState.Loading -> {
+                // Muestra un indicador de carga mientras espera la API
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-            items(listaDeIngresos) { ingreso ->
-                IngresoItem(ingreso)
+            is IncomeListUiState.Success -> {
+                // 4. Muestra la lista si la llamada fue exitosa
+                if (state.incomes.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("No tienes ingresos registrados.")
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(state.incomes) { ingreso -> // 'ingreso' es de tipo Transaction
+                            IngresoItem(
+                                ingreso = ingreso,
+                                modifier = Modifier.clickable {
+                                    // 5. ¡CORREGIDO! Navega usando el ID (que es Long)
+                                    navController.navigate(AppScreen.EditarIngreso.route + "/${ingreso.id}")
+                                }
+                            )
+                            Divider()
+                        }
+                    }
+                }
+            }
+            is IncomeListUiState.Error -> {
+                // Muestra un mensaje de error si la API falla
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = state.message, color = Color.Red, textAlign = TextAlign.Center)
+                }
             }
         }
     }
@@ -125,7 +161,7 @@ fun CircleActionButton(
 }
 
 @Composable
-fun IngresoItem(ingreso: Ingreso, modifier: Modifier = Modifier) {
+fun IngresoItem(ingreso: Transaction, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -147,18 +183,18 @@ fun IngresoItem(ingreso: Ingreso, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = ingreso.descripcion,
+                    text = ingreso.description?: "Ingreso",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = ingreso.fecha,
+                    text = ingreso.date,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
             }
             Text(
-                text = "+ S/. ${String.format(Locale.US, "%,.2f", ingreso.monto)}",
+                text = "+ S/. ${String.format(Locale.US, "%,.2f", ingreso.amount)}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2E7D32)

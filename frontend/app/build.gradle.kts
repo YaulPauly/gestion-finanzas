@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
@@ -53,6 +54,14 @@ dependencies {
     //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     // Convertidor Moshi
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    //Moshi traductor JSON
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+    // Interceptor de OkHttp (Para ver las llamadas en Logcat)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+
+    //Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
 
