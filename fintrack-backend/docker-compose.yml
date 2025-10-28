@@ -1,23 +1,6 @@
 version: "3.8"
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: finanzas-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: finanzas_db
-    ports:
-      - "3308:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - finanzas-network
-    healthcheck:
-      timeout: 20s
-      retries: 10
-
   backend:
     build: .
     container_name: fintrack-backend
@@ -25,22 +8,17 @@ services:
       - "8080:8080"
     environment:
       SPRING_APPLICATION_NAME: fintrack-backend
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/finanzas_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d3vfn3ili9vc73cppo40-a.oregon-postgres.render.com:5432/finanzas_db_no00
+      SPRING_DATASOURCE_USERNAME: finanzas_db_no00_user
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
       JWT_SECRET: my_super_secret_jwt_key_1234567890123456
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_HTTP_CONVERTER_JSON: DEBUG
-    depends_on:
-      - mysql
     networks:
       - finanzas-network
-
-volumes:
-  mysql_data:
 
 networks:
   finanzas-network:
