@@ -161,10 +161,10 @@ fun AppNavigation() {
             }
 
             // --- Rutas de Metas (Goals) ---
-            composable(route = AppScreen.ListaMetas.route) { // Asumiendo que tienes AppScreen.Metas
+            composable(route = AppScreen.ListaMetas.route) {
                 ListaMetas(navController = navController)
             }
-            composable(route = AppScreen.CrearMeta.route) { // Asumiendo AppScreen.CrearMeta
+            composable(route = AppScreen.CrearMeta.route) {
                 CrearMetaScreen(navController = navController)
             }
 
@@ -173,8 +173,7 @@ fun AppNavigation() {
                 RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable(route = AppScreen.RegistrarGastos.route) {
-                // ¡CORREGIDO! La llamada estaba malformada
-                RegistrarGastosScreen(navController = navController)
+                RegistrarGastoScreen(navController = navController)
             }
 
             // --- Rutas de Edición (CRUD) ---
