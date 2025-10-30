@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -75,7 +76,8 @@ fun AppNavigation() {
         AppScreen.Home,
         AppScreen.Ingreso,
         AppScreen.Gastos,
-        AppScreen.Movimientos
+        AppScreen.Movimientos,
+        AppScreen.ListaMetas
     )
 
     Scaffold(
@@ -100,11 +102,12 @@ fun AppNavigation() {
                                         AppScreen.Gastos -> Icons.Default.Edit
                                         AppScreen.Movimientos -> Icons.AutoMirrored.Filled.Send
                                         AppScreen.CrearMeta -> TODO()
-                                        AppScreen.ListaMetas -> TODO()
+                                        AppScreen.ListaMetas -> Icons.AutoMirrored.Filled.List
                                         AppScreen.EditarGastos -> TODO()
                                         AppScreen.EditarIngreso -> TODO()
                                         AppScreen.RegistrarGastos -> TODO()
                                         AppScreen.RegistrarIngreso -> TODO()
+                                        AppScreen.ContribuirMeta -> TODO()
                                     },
                                     contentDescription = screen.title
                                 )
@@ -135,7 +138,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination, // <-- RUTA INICIAL DINÁMICA
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             // --- Rutas de Autenticación ---
@@ -159,10 +162,28 @@ fun AppNavigation() {
 
             // --- Rutas de Metas (Goals) ---
             composable(route = AppScreen.ListaMetas.route) {
-                ListaMetas(navController = navController)
+                ListaMetasScreen(navController = navController)
             }
+
+            // Ruta para crear meta
             composable(route = AppScreen.CrearMeta.route) {
-                CrearMetaScreen(navController = navController)
+                CrearMetaScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            // --- Ruta para Contribuir a Meta ---
+            composable(
+                route = AppScreen.ContribuirMeta.route, // "contribuir_meta/{goalId}"
+                arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val goalId = backStackEntry.arguments?.getLong("goalId")
+                if (goalId != null) {
+                    ContribuirMetaScreen(
+                        goalId = goalId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                } else {
+                    navController.popBackStack()
+                }
             }
 
             // --- Rutas de Creación (CRUD) ---
@@ -170,7 +191,6 @@ fun AppNavigation() {
                 RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable(route = AppScreen.RegistrarGastos.route) {
-                // ¡CORREGIDO! La llamada estaba malformada
                 RegistrarGastoScreen(navController = navController)
             }
 
@@ -191,7 +211,7 @@ fun AppNavigation() {
             }
 
             composable(
-                route = AppScreen.EditarGastos.route, // "editar_gastos/{transactionId}"
+                route = AppScreen.EditarGastos.route,
                 arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
