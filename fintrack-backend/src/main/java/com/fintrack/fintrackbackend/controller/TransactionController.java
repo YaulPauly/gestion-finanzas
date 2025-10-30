@@ -23,10 +23,10 @@ public class TransactionController {
     // Método auxiliar para obtener el userId del contexto de seguridad.
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Asume que el ID del usuario (Integer) fue puesto en el Principal durante la autenticación JWT
         if (authentication != null && authentication.getPrincipal() instanceof Integer) {
             return (Integer) authentication.getPrincipal();
         }
-        // Este error solo debería ocurrir si el token es inválido o el endpoint no está protegido
         throw new IllegalStateException("ID de usuario no encontrado en el contexto de seguridad.");
     }
 
@@ -88,16 +88,8 @@ public class TransactionController {
     // Obtener los detalles de una transacción por ID.
     @GetMapping("/{id}")
     public ResponseEntity<Transaction> getTransactionDetails(@PathVariable Long id) {
-
         Integer userId = getCurrentUserId();
-        try {
-            Transaction transaction = transactionService.getTransactionById(id, userId);
-        } catch (Exception e) {
-            throw new IllegalStateException("El ID de usuario no se pudo obtener del contexto de seguridad.");
-        }
-        // 3. Usar el userId para la consulta segura
         Transaction transaction = transactionService.getTransactionById(id, userId);
-
         return ResponseEntity.ok(transaction);
     }
 }

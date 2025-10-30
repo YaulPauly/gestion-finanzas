@@ -96,15 +96,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Transaction getTransactionById(Long id,Integer userId) {
         return transactionRepository.findByIdAndUserId(id, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada con id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada o no pertenece al usuario."));
     }
 
     @Override
     @Transactional
     public Transaction updateExpense(Long id, ExpenseRequest request, Integer userId) {
         // 1. Buscar la transacción existente
-        Transaction existingTransaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Gasto no encontrado con id: " + id));
+        Transaction existingTransaction = transactionRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Gasto no encontrado o no pertenece al usuario con id: " + id));
 
         // 2. Validar que sea un Gasto (si tu API maneja Incomes y Expenses juntas)
         if (existingTransaction.getType() != TransactionType.EXPENSE) {
@@ -119,7 +119,7 @@ public class TransactionServiceImpl implements TransactionService {
         Category newCategory = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada."));
 
-        existingTransaction.setCategoryId(request.getCategoryId());
+        existingTransaction.setCategoryId(newCategory.getId());
 
         // 4. Guardar y retornar
         return transactionRepository.save(existingTransaction);
@@ -128,20 +128,26 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public Transaction updateIncome(Long id, IncomeRequest request,Integer userId) {
-        Transaction existingTransaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ingreso no encontrado con id: " + id));
-        // 1. Validar que sea un Ingreso (INCOME)
+        // 1. BUSCAR LA TRANSACCIÓN DE FORMA SEGURA (Por ID y USER ID)
+        Transaction existingTransaction = transactionRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingreso no encontrado o no pertenece al usuario con id: " + id));
+
+        // 2. Validar que sea un Ingreso (INCOME)
         if (existingTransaction.getType() != TransactionType.INCOME) {
             throw new InvalidOperationException("La transacción con id " + id + " no es un Ingreso.");
         }
-        // 2. Actualizar campos (Monto y Descripción)
+
+        // 3. Actualizar campos (Monto y Descripción)
         existingTransaction.setAmount(request.getAmount());
         existingTransaction.setDescription(request.getDescription());
-        // 3. Actualizar Categoría
+
+        // Actualizar Categoría
         Category newCategory = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada."));
 
-        existingTransaction.setCategoryId(request.getCategoryId());
+        // Usamos el ID de la Categoría.
+        existingTransaction.setCategoryId(newCategory.getId());
+
         // 4. Guardar y retornar
         return transactionRepository.save(existingTransaction);
     }
