@@ -196,7 +196,7 @@ fun AppNavigation() {
 
             // --- Rutas de Edición (CRUD) ---
             composable(
-                route = AppScreen.EditarIngreso.route,
+                route = AppScreen.EditarIngreso.route, // "editar_ingresos/{transactionId}"
                 arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
@@ -214,12 +214,16 @@ fun AppNavigation() {
                 route = AppScreen.EditarGastos.route,
                 arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
             ) { backStackEntry ->
+                // 3. Extrae el ID del argumento de la pila
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
+                // 4. Llama a la pantalla de edición si el ID existe
                 if (transactionId != null) {
-
-                    Text("Placeholder para Editar Gasto ID: $transactionId")
-
+                    EditarGastoScreen(
+                        navController = navController,
+                        expenseId = transactionId // Pasa el ID a tu Composable
+                    )
                 } else {
+                    // En caso de que se navegue mal, vuelve atrás.
                     navController.popBackStack()
                 }
             }

@@ -134,8 +134,10 @@ fun ListaGastosScreen(
                     items(expenseState.expenses) { gasto ->
                         GastosItem(
                             gasto = gasto,
+                            // APLICACIÓN DEL MODIFICADOR CLICKABLE:
                             modifier = Modifier.clickable {
-                                navController.navigate(AppScreen.EditarGastos.route + "/${gasto.id}")
+                                val route = AppScreen.EditarGastos.createRoute(gasto.id)
+                                navController.navigate(route)
                             }
                         )
                     }

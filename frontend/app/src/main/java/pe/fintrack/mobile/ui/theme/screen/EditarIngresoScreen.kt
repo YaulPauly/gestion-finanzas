@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack // Import para "Volver"
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,7 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults // Import para el icono del dropdown
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -41,7 +41,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pe.fintrack.mobile.ui.theme.data.model.Category
-
+import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
+import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModel
+import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModelFactory
 
 import pe.fintrack.mobile.ui.viewmodel.FormUiState
 import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
@@ -49,17 +51,25 @@ import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarIngresoScreen(
-    transactionId: Long, // 1. Recibe el ID de la transacción
+    transactionId: Long, // Recibe el ID de la transacción
     onNavigateBack: () -> Unit,
-    viewModel: TransactionViewModel = viewModel()
 ) {
-    // Estados para los campos
+    // 1. OBTENER DEPENDENCIAS Y FACTORY (Debe ir PRIMERO)
+    val apiService = RetrofitClient.instance
+    val factory = ExpenseViewModelFactory(apiService)
+
+    // 2. OBTENER EL VIEWMDEL
+    val viewModel: TransactionViewModel = viewModel(factory = factory)
+
+    // 3. DECLARAR ESTADOS LOCALES (con remember)
     var monto by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     var descripcion by remember { mutableStateOf("") }
 
-    // Estados de UI
-    var expanded by remember { mutableStateOf(false) } // Para el dropdown
+    // 4. COLECTAR ESTADOS DEL VIEWMDEL (collectAsState)
+    var expanded by remember { mutableStateOf(false) }
+
+    // Estas variables ahora acceden al 'viewModel' que ya está declarado.
     val categorias by viewModel.categories.collectAsState()
     val formState by viewModel.formState.collectAsState()
     val transactionToEdit by viewModel.selectedTransaction.collectAsState()
@@ -67,7 +77,7 @@ fun EditarIngresoScreen(
     // 2. Carga los datos de la transacción al entrar
     LaunchedEffect(key1 = transactionId) {
         viewModel.loadTransactionDetails(transactionId)
-        // (loadCategories se llama en el init del ViewModel)
+        viewModel.loadCategories()
     }
 
     // 3. Rellena el formulario cuando los datos de la transacción se cargan
@@ -222,20 +232,6 @@ fun EditarIngresoScreen(
                     } else {
                         Text("Guardar Cambios") // Texto cambiado
                     }
-                }
-
-                // --- (Opcional) Botón Eliminar ---
-                OutlinedButton(
-                    onClick = {
-                        // 6. Llama a DELETE (necesitas añadir 'deleteIncome' al ViewModel)
-                        // viewModel.deleteIncome(transactionId, onNavigateBack)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Eliminar Ingreso")
                 }
 
                 // Muestra mensaje de error si existe

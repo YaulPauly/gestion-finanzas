@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
 import pe.fintrack.mobile.ui.theme.data.model.Category
-
 import pe.fintrack.mobile.ui.viewmodel.FormUiState
 import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 
