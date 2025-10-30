@@ -1,15 +1,18 @@
 package pe.fintrack.mobile
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -43,6 +46,7 @@ import pe.fintrack.mobile.ui.theme.data.TokenManager
 import pe.fintrack.mobile.ui.theme.screen.*
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TokenManager.init(this)
@@ -55,6 +59,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
@@ -71,7 +76,8 @@ fun AppNavigation() {
         AppScreen.Home,
         AppScreen.Ingreso,
         AppScreen.Gastos,
-        AppScreen.Movimientos
+        AppScreen.Movimientos,
+        AppScreen.ListaMetas
     )
 
     Scaffold(
@@ -96,11 +102,12 @@ fun AppNavigation() {
                                         AppScreen.Gastos -> Icons.Default.Edit
                                         AppScreen.Movimientos -> Icons.AutoMirrored.Filled.Send
                                         AppScreen.CrearMeta -> TODO()
-                                        AppScreen.ListaMetas -> TODO()
+                                        AppScreen.ListaMetas -> Icons.AutoMirrored.Filled.List
                                         AppScreen.EditarGastos -> TODO()
                                         AppScreen.EditarIngreso -> TODO()
                                         AppScreen.RegistrarGastos -> TODO()
                                         AppScreen.RegistrarIngreso -> TODO()
+                                        AppScreen.ContribuirMeta -> TODO()
                                     },
                                     contentDescription = screen.title
                                 )
@@ -150,15 +157,33 @@ fun AppNavigation() {
                 GastosScreen(navController = navController, modifier = Modifier)
             }
             composable(route = AppScreen.Movimientos.route) {
-                MovimientosScreen(/*navController = navController*/)
+                MovimientosScreen(navController = navController)
             }
 
             // --- Rutas de Metas (Goals) ---
             composable(route = AppScreen.ListaMetas.route) {
-                ListaMetas(navController = navController)
+                ListaMetasScreen(navController = navController)
             }
+
+            // Ruta para crear meta
             composable(route = AppScreen.CrearMeta.route) {
-                CrearMetaScreen(navController = navController)
+                CrearMetaScreen(onNavigateBack = { navController.popBackStack() })
+            }
+
+            // --- Ruta para Contribuir a Meta ---
+            composable(
+                route = AppScreen.ContribuirMeta.route, // "contribuir_meta/{goalId}"
+                arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val goalId = backStackEntry.arguments?.getLong("goalId")
+                if (goalId != null) {
+                    ContribuirMetaScreen(
+                        goalId = goalId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                } else {
+                    navController.popBackStack()
+                }
             }
 
             // --- Rutas de Creación (CRUD) ---
@@ -186,14 +211,8 @@ fun AppNavigation() {
             }
 
             composable(
-                // 1. Usa el route con la variable {transactionId}
                 route = AppScreen.EditarGastos.route,
-                arguments = listOf(
-                    // 2. Define el argumento para que NavController sepa esperar un Long
-                    navArgument("transactionId") {
-                        type = NavType.LongType
-                    }
-                )
+                arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
             ) { backStackEntry ->
                 // 3. Extrae el ID del argumento de la pila
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")

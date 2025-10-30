@@ -80,12 +80,14 @@ interface ApiService {
     suspend fun contributeToGoal(
         @Path("id") goalId: Long,
         @Body contributionRequest: GoalContributionRequest
-    ): Response<Goal> // Devuelve la meta actualizada
+    ): Response<Goal>
 
     @POST("api/goals/{id}/archive")
     suspend fun archiveGoal(@Path("id") goalId: Long): Response<Goal> // Devuelve la meta actualizada
 
     @GET("api/transaction/{id}")
     suspend fun getTransactionById(@Path("id") transactionId: Long): Response<Transaction>
+
+
 
 }

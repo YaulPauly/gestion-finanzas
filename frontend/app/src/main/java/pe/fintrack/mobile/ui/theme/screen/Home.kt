@@ -18,6 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,13 +39,19 @@ import java.util.Locale
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, homeViewModel: HomeViewModel = viewModel()) {
     // estado de viewmodel
     val summaryState by homeViewModel.summaryState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
     // Formatear monedas
     val currencyFormatter = remember { DecimalFormat("S/ #,##0.00",
         DecimalFormatSymbols(Locale("es","PE"))
     )}
 
     val nombreUsuario = remember { TokenManager.getUserName() ?: "Usuario" }
-
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            // Llama a la función en tu ViewModel para recargar el resumen
+            homeViewModel.fetchSummary()
+        }
+    }
 
     Column(
         modifier = modifier
@@ -97,7 +106,9 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ResumenCard(
@@ -124,11 +135,16 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
                 )
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).weight(1f), /* ... */
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .weight(1f), /* ... */
                 ) {
                     // Muestra la lista de transacciones recientes del ViewModel
                     if (summary.recentTransactions.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp), contentAlignment = Alignment.Center) {
                             Text("No hay movimientos recientes")
                         }
                     } else {
@@ -165,14 +181,16 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
             }
             is DashboardUiState.Error -> {
                 // Muestra un mensaje de error centrado
-                Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp), contentAlignment = Alignment.Center) {
                     Text(
                         "Error al cargar: ${state.message}",
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center
                     )
                     // Podrías añadir un botón para reintentar
-                    Button(onClick = { homeViewModel.loadDashboardSummary() }) {
+                    Button(onClick = { homeViewModel.fetchSummary() }) {
                         Text("Reintentar")
                     }
                 }

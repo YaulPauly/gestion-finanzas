@@ -19,10 +19,10 @@ class HomeViewModel : ViewModel() {
     val summaryState: StateFlow<DashboardUiState> = _summaryState.asStateFlow()
 
     init {
-        loadDashboardSummary()
+        fetchSummary()
     }
 
-    fun loadDashboardSummary() {
+    fun fetchSummary() {
         viewModelScope.launch {
             _summaryState.value = DashboardUiState.Loading
             try{

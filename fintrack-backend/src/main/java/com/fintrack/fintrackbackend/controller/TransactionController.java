@@ -7,6 +7,9 @@ import com.fintrack.fintrackbackend.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -16,6 +19,15 @@ public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
+
+    // Método auxiliar para obtener el userId del contexto de seguridad.
+    private Integer getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Integer) {
+            return (Integer) authentication.getPrincipal();
+        }
+        throw new IllegalStateException("ID de usuario no encontrado en el contexto de seguridad.");
+    }
 
     // Crear ingreso
     @PostMapping("/income")
@@ -47,5 +59,36 @@ public class TransactionController {
                                             @RequestParam(defaultValue = "10") int size) {
         Integer userId = (Integer) servletRequest.getAttribute("userId");
         return transactionService.getExpensesByUser(userId, page, size);
+    }
+
+    // Actualizar gastos
+    @PutMapping("/expense/{id}")
+    public ResponseEntity<Transaction> updateExpense(
+            @PathVariable Long id,
+            @Valid @RequestBody ExpenseRequest request) {
+
+        Integer userId = getCurrentUserId(); // 1. Obtener userId
+        Transaction updatedTransaction = transactionService.updateExpense(id, request, userId);
+
+        return ResponseEntity.ok(updatedTransaction);
+    }
+
+    // Actualizar ingresos
+    @PutMapping("/income/{id}")
+    public ResponseEntity<Transaction> updateIncome(
+            @PathVariable Long id,
+            @Valid @RequestBody IncomeRequest request) {
+
+        Integer userId = getCurrentUserId();
+        Transaction updatedTransaction = transactionService.updateIncome(id, request, userId);
+        return ResponseEntity.ok(updatedTransaction);
+    }
+
+    // Obtener los detalles de una transacción por ID.
+    @GetMapping("/{id}")
+    public ResponseEntity<Transaction> getTransactionDetails(@PathVariable Long id) {
+        Integer userId = getCurrentUserId();
+        Transaction transaction = transactionService.getTransactionById(id, userId);
+        return ResponseEntity.ok(transaction);
     }
 }

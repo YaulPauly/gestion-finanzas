@@ -7,7 +7,6 @@ import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 
 class ExpenseViewModelFactory(private val apiService: ApiService) : ViewModelProvider.Factory {
 
-    // Sobreescribe el ÚNICO método "create" de la interfaz
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         // 1. Manejar ExpenseViewModel (Gastos)
         if (modelClass.isAssignableFrom(ExpenseViewModel::class.java)) {

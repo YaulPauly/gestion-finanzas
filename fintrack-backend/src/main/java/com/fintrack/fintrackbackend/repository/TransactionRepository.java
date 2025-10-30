@@ -12,9 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    // ✅ Método necesario para obtener una transacción de manera segura (por su ID y el ID del usuario)
+    Optional<Transaction> findByIdAndUserId(Long id, Integer userId);
+
     Page<Transaction> findByUserIdAndType(Integer userId, TransactionType type, Pageable pageable);
     List<Transaction> findByUserIdOrderByCreatedAtDesc(Integer userId, Pageable pageable);
     List<Transaction> findByUserIdAndTypeAndDateBetweenOrderByDateAsc(Integer userId,
