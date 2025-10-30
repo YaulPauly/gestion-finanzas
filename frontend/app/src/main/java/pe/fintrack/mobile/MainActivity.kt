@@ -150,7 +150,7 @@ fun AppNavigation() {
                 GastosScreen(navController = navController, modifier = Modifier)
             }
             composable(route = AppScreen.Movimientos.route) {
-                MovimientosScreen(/*navController = navController*/)
+                MovimientosScreen(navController = navController)
             }
 
             // --- Rutas de Metas (Goals) ---
