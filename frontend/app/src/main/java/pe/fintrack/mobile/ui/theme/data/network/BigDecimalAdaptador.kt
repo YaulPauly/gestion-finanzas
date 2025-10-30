@@ -16,7 +16,7 @@ object BigDecimalAdaptador {
 
     @ToJson
     fun toJson(value: BigDecimal): String {
-        return value.toPlainString() // toPlainString evita notación científica
+        return value.toPlainString()
     }
 
 }

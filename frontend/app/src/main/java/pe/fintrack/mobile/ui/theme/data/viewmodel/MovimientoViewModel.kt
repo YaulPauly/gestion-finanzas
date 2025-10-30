@@ -33,7 +33,7 @@ class MovimientoViewModel : ViewModel(){
             _uiState.value = MovimientoListaUiState.Loading
 
             try {
-                // Lanza ambas llamadas en paralelo
+
                 val incomesResponse = RetrofitClient.instance.getIncomes(page = 0, size = 20)
                 val expensesResponse = RetrofitClient.instance.getExpenses(page = 0, size = 20)
                 val categoriesResponse = RetrofitClient.instance.getCategories()
@@ -42,7 +42,6 @@ class MovimientoViewModel : ViewModel(){
                     val incomeList = incomesResponse.body()?.content ?: emptyList()
                     val expenseList = expensesResponse.body()?.content ?: emptyList()
                     val categoryList = categoriesResponse.body() ?: emptyList()
-                    // Combina las listas y ordénalas
                     val combinedList = (incomeList + expenseList).sortedByDescending { it.date }
                     _uiState.value = MovimientoListaUiState.Success(combinedList,categoryList)
                 } else {

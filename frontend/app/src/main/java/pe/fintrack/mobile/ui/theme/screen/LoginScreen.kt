@@ -15,15 +15,13 @@ import pe.fintrack.mobile.ui.theme.data.viewmodel.LoginUiState
 
 @Composable
 fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()){
-    var email by remember { mutableStateOf("juan.perez@example.com") } // Valor por defecto para prueba
-    var password by remember { mutableStateOf("hashed_password_123") } // Valor por defecto
+    var email by remember { mutableStateOf("juan.perez@example.com") }
+    var password by remember { mutableStateOf("hashed_password_123") }
     val loginState by authViewModel.loginState.collectAsState()
-
-    // Observa el estado del login para navegar o mostrar mensajes
     LaunchedEffect(loginState) {
         if (loginState is LoginUiState.Success) {
             navController.navigate(AppScreen.Home.route) {
-                popUpTo(navController.graph.id) { inclusive = true } // Limpia el stack de navegación
+                popUpTo(navController.graph.id) { inclusive = true }
             }
         }
     }
@@ -51,7 +49,6 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
 
         )
         Spacer(modifier = Modifier.height(24.dp))
-        // Muestra el botón o un indicador de carga
         when (loginState) {
             is LoginUiState.Loading -> CircularProgressIndicator()
             else -> Button(

@@ -77,7 +77,6 @@ fun ListaGastosScreen(
             .background(Color(0xFFF0F0F0))
             .padding(horizontal = 16.dp)
     ) {
-        // --- CABECERA Y BOTONES DE ACCIÓN (Sin cambios) ---
         Text(
             text = "Gastos",
             style = MaterialTheme.typography.headlineLarge,
@@ -101,8 +100,7 @@ fun ListaGastosScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        //  RENDERIZADO CONDICIONAL DE LA LISTA SEGÚN EL ESTADO
-        // **********************************************
+
         when {
             // Muestra indicador de carga mientras se obtienen los datos
             expenseState.isLoading && expenseState.expenses.isEmpty() -> {
@@ -172,7 +170,6 @@ fun ListaGastosScreen(
                 }
             }
 
-            // Muestra mensaje si la lista está vacía y no hay errores ni carga
             else -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -237,7 +234,6 @@ fun CircleActionButton(
 
 @Composable
 fun GastosItem(gasto: Transaction, modifier: Modifier = Modifier) {
-    // Formateador de moneda
     val currencyFormatter =
         remember { DecimalFormat("S/ #,##0.00", java.text.DecimalFormatSymbols(Locale("es", "PE"))) }
 
@@ -262,12 +258,12 @@ fun GastosItem(gasto: Transaction, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = gasto.description ?: "Gasto", // Usa la descripción
+                    text = gasto.description ?: "Gasto",
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = gasto.date, // Usa la fecha (puedes formatearla)
+                    text = gasto.date,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -277,7 +273,7 @@ fun GastosItem(gasto: Transaction, modifier: Modifier = Modifier) {
                 text = "- ${currencyFormatter.format(gasto.amount)}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF821E1E) // Rojo para gastos
+                color = Color(0xFF821E1E)
             )
         }
     }

@@ -18,14 +18,14 @@ import java.math.BigDecimal
 
 
 sealed class FormUiState {
-    object Idle : FormUiState() // Estado inicial
-    object Loading : FormUiState() // Guardando/Cargando
-    object Success : FormUiState() // Éxito al guardar
-    data class Error(val message: String) : FormUiState() // Error
+    object Idle : FormUiState()
+    object Loading : FormUiState()
+    object Success : FormUiState()
+    data class Error(val message: String) : FormUiState()
 }
 
 class TransactionViewModel(
-    private val apiService: ApiService // <-- Recibe ApiService
+    private val apiService: ApiService
 ) : ViewModel() {
 
     // --- Para el Dropdown de Categorías ---
@@ -46,7 +46,7 @@ class TransactionViewModel(
     private val _formState = MutableStateFlow<FormUiState>(FormUiState.Idle)
     val formState: StateFlow<FormUiState> = _formState.asStateFlow()
 
-    // 1. Carga las categorías para el dropdown
+    // Carga las categorías para el dropdown
     fun loadCategories() {
         viewModelScope.launch {
             try {
@@ -55,12 +55,12 @@ class TransactionViewModel(
                     _categories.value = response.body()!!
                 }
             } catch (e: IOException) {
-                // Manejar error de red (ej. en un StateFlow de error)
+                // Manejar error de red
             }
         }
     }
 
-    // 2. Crea un nuevo ingreso
+    //  Crea un nuevo ingreso
     fun createIncome(montoStr: String, categoryId: Int?, description: String?, onSuccess: () -> Unit) {
         if (montoStr.isBlank() || categoryId == null) {
             _formState.value = FormUiState.Error("Monto y categoría son obligatorios.")
@@ -90,7 +90,7 @@ class TransactionViewModel(
         }
     }
 
-    // 3. Carga datos de un ingreso existente (para Editar)
+    // Carga datos de un ingreso existente (para Editar)
     fun loadTransactionDetails(id: Long) {
         viewModelScope.launch {
             _formState.value = FormUiState.Loading
@@ -110,7 +110,6 @@ class TransactionViewModel(
         }
     }
 
-    // 4. Actualiza un ingreso existente
     fun updateIncome(id: Long, montoStr: String, categoryId: Int?, description: String?, onSuccess: () -> Unit) {
         // Validación (similar a create)
         if (montoStr.isBlank() || categoryId == null) {
@@ -141,7 +140,6 @@ class TransactionViewModel(
         }
     }
 
-    // 5. Resetea el estado del formulario al salir de la pantalla
     fun resetFormState() {
         _formState.value = FormUiState.Idle
         _selectedTransaction.value = null

@@ -18,10 +18,7 @@ object ReportDownloader{
         }
 
         try {
-            // Crea el nombre del archivo con la fecha actual
             val fileName = "reporte_fintrack_${System.currentTimeMillis()}.pdf"
-
-            // Configura la solicitud de descarga
             val request = DownloadManager.Request(Uri.parse(REPORT_URL))
                 .setTitle("Reporte Mensual (FinTrack)")
                 .setDescription("Descargando PDF...")
@@ -29,12 +26,8 @@ object ReportDownloader{
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
                 .addRequestHeader("Authorization", "Bearer $token") // <-- AÑADE EL TOKEN AQUÍ
                 .setMimeType("application/pdf")
-                .setAllowedOverMetered(true) // Permite descarga con datos móviles
-
-            // Obtiene el servicio de DownloadManager
+                .setAllowedOverMetered(true)
             val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-
-            // Pone la descarga en cola
             downloadManager.enqueue(request)
 
             Toast.makeText(context, "Iniciando descarga...", Toast.LENGTH_SHORT).show()

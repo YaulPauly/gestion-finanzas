@@ -83,7 +83,7 @@ interface ApiService {
     ): Response<Goal>
 
     @POST("api/goals/{id}/archive")
-    suspend fun archiveGoal(@Path("id") goalId: Long): Response<Goal> // Devuelve la meta actualizada
+    suspend fun archiveGoal(@Path("id") goalId: Long): Response<Goal>
 
     @GET("api/transaction/{id}")
     suspend fun getTransactionById(@Path("id") transactionId: Long): Response<Transaction>

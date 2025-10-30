@@ -17,11 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email // <-- Lo usaremos para el FAB
-import androidx.compose.material3.FloatingActionButton // <-- IMPORT AÑADIDO
-import androidx.compose.material3.Icon // <-- IMPORT AÑADIDO
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold // <-- IMPORT AÑADIDO
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
-// (Tus imports de data/viewmodel. Asumiendo que las rutas son correctas)
 import pe.fintrack.mobile.ui.theme.data.Transaction
 import pe.fintrack.mobile.ui.theme.data.TransactionType
 import pe.fintrack.mobile.ui.theme.data.viewmodel.MovimientoListaUiState
@@ -67,17 +66,14 @@ fun MovimientosScreen(
     val inputFormatter = DateTimeFormatter.ISO_LOCAL_DATE
     val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
-    // --- 1. Envolvemos todo en un Scaffold ---
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        // --- 2. Añadimos el FloatingActionButton ---
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // --- 3. Ponemos la lógica de descarga aquí ---
                     movementViewModel.downloadReport(context)
                 },
-                containerColor = MaterialTheme.colorScheme.primary // (Puedes cambiar el color)
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
                     imageVector = Icons.Default.Email,
@@ -86,10 +82,10 @@ fun MovimientosScreen(
                 )
             }
         }
-    ) { innerPadding -> // El Scaffold nos da un padding
+    ) { innerPadding ->
 
         Column(
-            modifier = Modifier // quitamos el modifier original
+            modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF0F0F0))
                 .padding(innerPadding) // <-- 5. Aplicamos el padding aquí
@@ -103,7 +99,7 @@ fun MovimientosScreen(
                 modifier = Modifier.padding(top = 16.dp)
             )
 
-            // --- 4. ELIMINAMOS EL BOX QUE TENÍA EL BOTÓN ANTIGUO ---
+            //
             // Box(
             //     modifier = Modifier
             //         .fillMaxWidth()
@@ -117,24 +113,22 @@ fun MovimientosScreen(
             //     )
             // }
 
-            //Spacer(modifier = Modifier.height(24.dp)) // Ya no es necesario
-            Spacer(modifier = Modifier.height(16.dp)) // Un spacer más pequeño
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Contenido de la lista
             when (val state = uiState) {
-                is MovimientoListaUiState.Loading -> { // Estado corregido
+                is MovimientoListaUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
                 }
-                is MovimientoListaUiState.Success -> { // Estado corregido
+                is MovimientoListaUiState.Success -> {
                     if (state.movements.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("No se encontraron movimientos.")
                         }
                     } else {
 
-                        // 1. Crea un mapa de búsqueda (ID -> Nombre)
+
                         val categoryMap = remember(state.categories) {
                             state.categories.associateBy { it.id }
                         }
@@ -145,27 +139,25 @@ fun MovimientosScreen(
                         ) {
                             items(
                                 items = state.movements,
-                                key = { transaction -> transaction.id } // Clave única
+                                key = { transaction -> transaction.id }
                             ) { transaction: Transaction ->
                                 val esIngreso = transaction.type == TransactionType.INCOME
 
-                                // 2. Busca el nombre de la categoría en el mapa
                                 val categoryName = categoryMap[transaction.categoryId]?.name ?: "Movimiento"
 
-                                // 3. Parsea y formatea la fecha
                                 val formattedDate = try {
                                     LocalDate.parse(transaction.date, inputFormatter).format(outputFormatter)
                                 } catch (e: Exception) {
-                                    transaction.date // Fallback si el formato es incorrecto
+                                    transaction.date
                                 }
 
                                 MovimientoItem(
-                                    categoria = categoryName, // <-- CORREGIDO
-                                    fecha = formattedDate, // <-- CORREGIDO
+                                    categoria = categoryName,
+                                    fecha = formattedDate,
                                     monto = "${if (esIngreso) "+" else "-"} ${currencyFormatter.format(transaction.amount)}",
                                     esIngreso = esIngreso,
                                     modifier = Modifier.clickable {
-                                        // Navega a la pantalla de edición correcta
+
                                         val route = if (esIngreso) {
                                             AppScreen.EditarIngreso.createRoute(transaction.id)
                                         } else {
@@ -178,7 +170,7 @@ fun MovimientosScreen(
                         }
                     }
                 }
-                is MovimientoListaUiState.Error -> { // Estado corregido
+                is MovimientoListaUiState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = state.message,
