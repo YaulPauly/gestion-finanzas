@@ -1,5 +1,6 @@
 package pe.fintrack.mobile.ui.theme.data.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 
 import pe.fintrack.mobile.ui.theme.data.Transaction
 import pe.fintrack.mobile.ui.theme.data.model.Category
+import pe.fintrack.mobile.ui.theme.data.network.ReportDownloader
 import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
 import java.io.IOException
 
@@ -52,5 +54,10 @@ class MovimientoViewModel : ViewModel(){
                 _uiState.value = MovimientoListaUiState.Error("Error inesperado: ${e.message}")
             }
         }
+    }
+
+    fun downloadReport(context: Context){
+        ReportDownloader.download(context)
+
     }
 }
