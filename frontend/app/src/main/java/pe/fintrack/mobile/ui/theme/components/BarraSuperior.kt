@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,6 +23,7 @@ import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
 @Composable
 fun FinTrackTopBar(
     nombreUsuario: String,
+    onCerrarSesionClick: () -> Unit,
     onNotificationClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,6 +44,16 @@ fun FinTrackTopBar(
             }
         },
         actions = {
+            IconButton(onClick = onCerrarSesionClick) {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = "Cerrar Sesion",
+                    modifier = Modifier
+                        .background(Color(0xFFB33922), shape = CircleShape)
+                        .padding(8.dp),
+                    tint = Color(0xFFFFFFFF)
+                )
+            }
             // Botón para las notificaciones
             IconButton(onClick = onNotificationClick) {
                 Icon(
@@ -68,6 +81,7 @@ fun FinTrackTopBarPreview() {
     FintrackMobileTheme {
         FinTrackTopBar(
             nombreUsuario = "John Doe",
+            onCerrarSesionClick = {},
             onNotificationClick = {}
         )
     }

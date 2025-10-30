@@ -75,14 +75,7 @@ fun AppNavigation() {
     )
 
     Scaffold(
-        topBar = {
-            if (currentDestination?.route == AppScreen.Home.route) {
-                FinTrackTopBar(
-                    nombreUsuario = "Franco Peralta",
-                    onNotificationClick = { /* TODO: Implementar navegación a notificaciones */ }
-                )
-            }
-        },
+
         bottomBar = {
             NavigationBar (containerColor = Color(0xFF3C467B)){
                 navigationItems.forEach { screen ->
@@ -138,7 +131,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination, // <-- RUTA INICIAL DINÁMICA
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             // --- Rutas de Autenticación ---
@@ -157,7 +150,7 @@ fun AppNavigation() {
                 GastosScreen(navController = navController, modifier = Modifier)
             }
             composable(route = AppScreen.Movimientos.route) {
-                MovimientosScreen(/*navController = navController*/) // Pasa navController si lo necesita
+                MovimientosScreen(/*navController = navController*/)
             }
 
             // --- Rutas de Metas (Goals) ---
@@ -183,11 +176,10 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
                 if (transactionId != null) {
-                    // Debes crear esta pantalla "EditarIngresoScreen"
-                    // EditarIngresoScreen(transactionId = transactionId, navController = navController)
-                    // Por ahora, usamos RegistrarIngreso como placeholder si no la tienes:
-                    Text("Placeholder para Editar Ingreso ID: $transactionId")
-                    // RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
+                    EditarIngresoScreen(
+                        transactionId = transactionId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 } else {
                     navController.popBackStack()
                 }
@@ -199,11 +191,9 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
                 if (transactionId != null) {
-                    // Debes crear esta pantalla "EditarGastoScreen"
-                    // EditarGastoScreen(transactionId = transactionId, navController = navController)
-                    // Por ahora, usamos RegistrarGastos como placeholder:
+
                     Text("Placeholder para Editar Gasto ID: $transactionId")
-                    // RegistrarGastosScreen(navController = navController)
+
                 } else {
                     navController.popBackStack()
                 }

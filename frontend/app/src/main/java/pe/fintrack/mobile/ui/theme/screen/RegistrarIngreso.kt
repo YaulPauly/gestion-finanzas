@@ -16,17 +16,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
+import pe.fintrack.mobile.ui.theme.data.Category
+import pe.fintrack.mobile.ui.viewmodel.FormUiState
+import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrarIngresoScreen(onNavigateBack: () -> Unit) {
-    // Estados para cada campo del formulario
+fun RegistrarIngresoScreen(onNavigateBack: () -> Unit, viewModel: TransactionViewModel = viewModel()) {
+    // Estados para los campos del formulario
     var monto by remember { mutableStateOf("") }
-    var categoria by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf<Category?>(null) } // Almacena el objeto Category
     var descripcion by remember { mutableStateOf("") }
+
+    // Estados para el UI
     var expanded by remember { mutableStateOf(false) }
-    val categorias = listOf("Salario", "Ventas", "Bonos", "Regalo", "Otros") // Opciones de ejemplo
+    val categorias by viewModel.categories.collectAsState() // 2. Obtiene categorías del ViewModel
+    val formState by viewModel.formState.collectAsState() // 3. Observa el estado del form
+
+    // Resetea el estado cuando sales de la pantalla
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.resetFormState()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -94,7 +110,7 @@ fun RegistrarIngresoScreen(onNavigateBack: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = categoria,
+                        value = selectedCategory?.name ?: "",
                         onValueChange = { /* No se cambia directamente */ },
                         label = { Text("Ingresar categoria") },
                         placeholder = { Text("Categoria") },
@@ -112,9 +128,9 @@ fun RegistrarIngresoScreen(onNavigateBack: () -> Unit) {
                     ) {
                         categorias.forEach { item ->
                             DropdownMenuItem(
-                                text = { Text(item) },
+                                text = { Text(item.name) },
                                 onClick = {
-                                    categoria = item
+                                    selectedCategory = item
                                     expanded = false
                                 }
                             )
@@ -139,17 +155,32 @@ fun RegistrarIngresoScreen(onNavigateBack: () -> Unit) {
                 // --- Botón: Registrar ---
                 Button(
                     onClick = {
-                        // TODO: Lógica para registrar el ingreso.
+
+                        viewModel.createIncome(
+                            montoStr = monto,
+                            categoryId = selectedCategory?.id,
+                            description = descripcion,
+                            onSuccess = onNavigateBack
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF483D8B) // Color azul/púrpura oscuro
+                        containerColor = Color(0xFF483D8B)
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = formState != FormUiState.Loading // (Asegúrate de tener esto)
                 ) {
-                    Text("Registrar")
+                    if (formState == FormUiState.Loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 3.dp
+                        )
+                    } else {
+                        Text("Registrar")
+                    }
                 }
             }
         }

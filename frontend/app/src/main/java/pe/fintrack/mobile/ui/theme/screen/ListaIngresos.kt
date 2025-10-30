@@ -102,12 +102,11 @@ fun ListaIngresosScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(state.incomes) { ingreso -> // 'ingreso' es de tipo Transaction
+                        items(state.incomes) { ingreso ->
                             IngresoItem(
                                 ingreso = ingreso,
                                 modifier = Modifier.clickable {
-                                    // 5. ¡CORREGIDO! Navega usando el ID (que es Long)
-                                    navController.navigate(AppScreen.EditarIngreso.route + "/${ingreso.id}")
+                                    navController.navigate("editar_ingresos/${ingreso.id}")
                                 }
                             )
                             Divider()
