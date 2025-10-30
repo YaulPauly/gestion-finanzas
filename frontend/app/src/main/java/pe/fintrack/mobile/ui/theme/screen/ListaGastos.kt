@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,6 +29,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.size
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
@@ -37,26 +41,35 @@ import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
 import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModel
 import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModelFactory
 import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.util.Date
+
 import java.util.Locale
 
 @Composable
 fun ListaGastosScreen(
     navController: NavController,
     modifier: Modifier = Modifier
-    // expenseViewModel: ExpenseViewModel = viewModel() // <-- Así inyectarías el ViewModel
 ) {
-    // --- ESTADO (Ejemplo de cómo sería con ViewModel) ---
-    // val expenseState by expenseViewModel.expenseListState.collectAsState()
-    // Aquí usamos datos de ejemplo por ahora, pero usando el modelo Transaction
-    val apiService = remember { RetrofitClient.instance }// Obtener la instancia
+    val apiService = remember { RetrofitClient.instance }
     val factory = remember { ExpenseViewModelFactory(apiService) }
     val expenseViewModel: ExpenseViewModel = viewModel (factory = factory)
 
-// 2. CONSUMO DEL ESTADO DEL VIEWMODEL
+//  CONSUMO DEL ESTADO DEL VIEWMODEL
     // **********************************************
     val expenseState by expenseViewModel.expenseListState.collectAsState()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect (lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // Si la pantalla vuelve a primer plano (ej. al volver de 'Registrar' o 'Editar')
+            if (event == Lifecycle.Event.ON_RESUME) {
+                expenseViewModel.loadExpenses()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -84,16 +97,11 @@ fun ListaGastosScreen(
                     navController.navigate(AppScreen.RegistrarGastos.route)
                 }
             )
-            CircleActionButton(
-                text = "Generar\nReporte",
-                icon = Icons.Default.Email,
-                onClick = { /* TODO: Lógica para reporte */ }
-            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 3. RENDERIZADO CONDICIONAL DE LA LISTA SEGÚN EL ESTADO
+        //  RENDERIZADO CONDICIONAL DE LA LISTA SEGÚN EL ESTADO
         // **********************************************
         when {
             // Muestra indicador de carga mientras se obtienen los datos

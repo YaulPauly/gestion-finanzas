@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -23,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen // Importa tu sealed class
@@ -44,7 +48,19 @@ fun ListaIngresosScreen(
 ){
 
     val uiState by incomeViewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                incomeViewModel.loadIncomes()
+            }
+        }
 
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -75,11 +91,6 @@ fun ListaIngresosScreen(
                     navController.navigate(AppScreen.RegistrarIngreso.route)
                 }
             )
-            CircleActionButton(
-                text = "Generar\nReporte",
-                icon = Icons.Default.Email,
-                onClick = { /* TODO: Lógica para reporte */ }
-            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -92,7 +103,7 @@ fun ListaIngresosScreen(
                 }
             }
             is IncomeListUiState.Success -> {
-                // 4. Muestra la lista si la llamada fue exitosa
+                //  Muestra la lista si la llamada fue exitosa
                 if (state.incomes.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("No tienes ingresos registrados.")

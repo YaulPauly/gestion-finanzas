@@ -22,6 +22,9 @@ class ExpenseViewModel(
     // --- Estado para la Lista de Gastos (ReadOnly) ---
     private val _expenseListState = MutableStateFlow(ExpenseListUiState())
     val expenseListState: StateFlow<ExpenseListUiState> = _expenseListState.asStateFlow()
+    init {
+        loadExpenses() // Llama a la API al iniciar
+    }
 
     // --- Nuevo Estado para Categorías ---
     private val _categoryState = MutableStateFlow<List<Category>>(emptyList())
