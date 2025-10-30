@@ -20,6 +20,10 @@ interface ApiService {
     @GET("api/categories")
     suspend fun getCategories(): Response<List<Category>> // Devuelve una lista
 
+    // --- Obtener id de transaciones ---
+    @GET("api/transactions/{id}")
+    suspend fun getTransactionDetails(@Path("id") transactionId: Long): Response<Transaction>
+
     // --- Transacciones (Ingresos) ---
     @POST("api/transactions/income")
     suspend fun createIncome(@Body incomeRequest: IncomeRequest): Response<Transaction> // Devuelve la transacción creada
@@ -49,13 +53,13 @@ interface ApiService {
         @Query("size") size: Int = 10
     ): Response<PagedResult<Transaction>>
 
-    @PUT("api/transactions/expense/{id}") // Asumiendo ruta
+    @PUT("api/transactions/expense/{id}")
     suspend fun updateExpense(
         @Path("id") transactionId: Long,
         @Body expenseRequest: ExpenseRequest
     ): Response<Transaction>
 
-    @DELETE("api/transactions/expense/{id}") // Asumiendo ruta
+    @DELETE("api/transactions/expense/{id}")
     suspend fun deleteExpense(@Path("id") transactionId: Long): Response<Unit>
 
     // --- Metas de Ahorro ---
@@ -78,7 +82,7 @@ interface ApiService {
         @Body contributionRequest: GoalContributionRequest
     ): Response<Goal> // Devuelve la meta actualizada
 
-    @POST("api/goals/{id}/archive") // Asumiendo que es un POST
+    @POST("api/goals/{id}/archive")
     suspend fun archiveGoal(@Path("id") goalId: Long): Response<Goal> // Devuelve la meta actualizada
 
     @GET("api/transaction/{id}")

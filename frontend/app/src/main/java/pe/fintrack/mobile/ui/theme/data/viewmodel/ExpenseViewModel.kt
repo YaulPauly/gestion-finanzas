@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pe.fintrack.mobile.ui.theme.data.Transaction
 import pe.fintrack.mobile.ui.theme.data.model.Category
 import pe.fintrack.mobile.ui.theme.data.model.ExpenseRequest
 import pe.fintrack.mobile.ui.theme.data.network.ApiService
@@ -36,19 +37,21 @@ class ExpenseViewModel(
         loadExpenses()
         loadCategories()
     }
-
     // ===================================================================
     // 1. OBTENER GASTOS (READ)
     // ===================================================================
 
-    fun loadExpenses(page: Int = 0, size: Int = 10) {
+    fun loadExpenses(resetPagination: Boolean = false, page: Int = 0, size: Int = 10) {
         viewModelScope.launch {
             // 1. Iniciar carga
-            _expenseListState.value = _expenseListState.value.copy(
-                isLoading = true,
-                error = null,
-                currentPage = page // Actualizar la página actual
-            )
+            if (resetPagination) {
+                _expenseListState.value = ExpenseListUiState(
+                    expenses = emptyList(), // Limpiar la lista
+                    currentPage = 0,        // Reiniciar la página
+                    hasMorePages = true,
+                    isLoading = true
+                )
+            }
 
             try {
                 // 2. Llamada a la API
@@ -115,7 +118,7 @@ class ExpenseViewModel(
                 if (response.isSuccessful && response.body() != null) {
                     // Éxito: Notificar a la UI y recargar la lista de gastos
                     _expenseActionState.value = ExpenseActionState.Success("Gasto registrado con éxito")
-                    loadExpenses(page = 0) // Recargar la primera página para ver el nuevo gasto
+                    loadExpenses(resetPagination = true, page = 0) // Recargar la primera página para ver el nuevo gasto
                 } else {
                     val error = response.errorBody()?.string() ?: "Error de registro desconocido."
                     _expenseActionState.value = ExpenseActionState.Error(error)
@@ -136,10 +139,11 @@ class ExpenseViewModel(
     // ===================================================================
 
     fun loadNextPage() {
-        // Solo carga si no está ya cargando y si hay más páginas disponibles
-        if (!_expenseListState.value.isLoading && _expenseListState.value.hasMorePages) {
-            val nextPage = _expenseListState.value.currentPage + 1
-            loadExpenses(page = nextPage)
+        val currentState = _expenseListState.value
+        // Solo carga si hay más páginas y no está cargando actualmente
+        if (currentState.hasMorePages && !currentState.isLoading) {
+            // La siguiente página es la actual + 1
+            loadExpenses(page = currentState.currentPage + 1)
         }
     }
 
@@ -160,6 +164,59 @@ class ExpenseViewModel(
             } catch (e: Exception) {
                 Log.e("ExpenseViewModel", "Fallo de conexión al cargar categorías", e)
             }
+        }
+    }
+
+    // ===================================================================
+    // 5. ACTUALIZAR GASTO
+    // ===================================================================
+
+    fun updateExpense(expenseId: Long, request: ExpenseRequest) {
+        _expenseActionState.value = ExpenseActionState.Loading
+
+        viewModelScope.launch {
+            try {
+                val response = apiService.updateExpense(expenseId, request)
+
+                if (response.isSuccessful) {
+                    _expenseActionState.value = ExpenseActionState.Success(
+                        "Gasto actualizado exitosamente."
+                    )
+                    // Importante: Recargar la lista de gastos para reflejar el cambio en ListaGastosScreen
+                    loadExpenses(resetPagination = true)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    _expenseActionState.value = ExpenseActionState.Error(
+                        errorBody ?: "Error ${response.code()}: No se pudo actualizar el gasto."
+                    )
+                }
+            } catch (e: HttpException) {
+                _expenseActionState.value = ExpenseActionState.Error(
+                    "Error HTTP: ${e.code()}. No se pudo contactar al servidor."
+                )
+            } catch (e: IOException) {
+                _expenseActionState.value = ExpenseActionState.Error(
+                    "Error de red. Verifica tu conexión a internet."
+                )
+            } catch (e: Exception) {
+                _expenseActionState.value = ExpenseActionState.Error(
+                    "Ocurrió un error inesperado al actualizar el gasto."
+                )
+            }
+        }
+    }
+    suspend fun getExpenseById(id: Long): Transaction? {
+        return try {
+            val response = apiService.getTransactionDetails(id)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                Log.e("ExpenseViewModel", "Error al obtener transacción ${id}: ${response.code()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("ExpenseViewModel", "Fallo de red al obtener transacción ${id}", e)
+            null
         }
     }
 }
