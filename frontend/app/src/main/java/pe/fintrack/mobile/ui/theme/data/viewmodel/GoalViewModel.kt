@@ -159,7 +159,7 @@ class GoalViewModel : ViewModel() {
                     } else {
                         onSuccess() // Si no se completó, solo navega atrás
                     }
-                    loadGoals() // Refresca la lista de metas en segundo plano
+
                 } else {
                     // Muestra el error del backend (ej: "Insufficient funds")
                     val errorMsg = response.errorBody()?.string() ?: "Error al transferir"

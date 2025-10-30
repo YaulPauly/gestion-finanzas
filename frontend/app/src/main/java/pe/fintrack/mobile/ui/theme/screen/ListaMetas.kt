@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,6 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen
@@ -36,6 +40,25 @@ fun ListaMetasScreen(
     viewModel: GoalViewModel = viewModel()
 ) {
     val uiState by viewModel.listState.collectAsState()
+
+    //Actualizar la vista
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // Si la pantalla vuelve a primer plano (ej. al volver de 'Contribuir')
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadGoals() // Recarga los datos
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // Se limpia el observador al salir de la pantalla
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
 
     Scaffold(
         floatingActionButton = {
