@@ -23,7 +23,6 @@ public class TransactionController {
     // Método auxiliar para obtener el userId del contexto de seguridad.
     private Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Asume que el ID del usuario (Integer) fue puesto en el Principal durante la autenticación JWT
         if (authentication != null && authentication.getPrincipal() instanceof Integer) {
             return (Integer) authentication.getPrincipal();
         }
@@ -66,7 +65,7 @@ public class TransactionController {
     @PutMapping("/expense/{id}")
     public ResponseEntity<Transaction> updateExpense(
             @PathVariable Long id,
-            @Valid @RequestBody ExpenseRequest request) { // Asegúrate de validar el cuerpo
+            @Valid @RequestBody ExpenseRequest request) {
 
         Integer userId = getCurrentUserId(); // 1. Obtener userId
         Transaction updatedTransaction = transactionService.updateExpense(id, request, userId);
