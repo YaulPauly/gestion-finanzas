@@ -20,8 +20,12 @@ sealed class AppScreen(val route: String, val title: String) {
 
     object Movimientos : AppScreen("movimientos", "Movimientos")
 
-    object ListaMetas : AppScreen("lista_metas", "Listas Metas")
+    // ------------- METAS ---------------
+    object ListaMetas : AppScreen("lista_metas", "Metas")
     object CrearMeta : AppScreen("crear_meta", "Crear Meta")
+    object ContribuirMeta : AppScreen("contribuir_meta/{goalId}", "Contribuir a Meta"){
+        fun createRoute(goalId: Long) = "contribuir_meta/$goalId"
+    }
 }
 
 
