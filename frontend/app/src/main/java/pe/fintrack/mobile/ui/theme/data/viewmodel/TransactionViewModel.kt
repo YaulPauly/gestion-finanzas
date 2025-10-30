@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-import pe.fintrack.mobile.ui.theme.data.Category
+
 import pe.fintrack.mobile.ui.theme.data.Transaction
+import pe.fintrack.mobile.ui.theme.data.model.Category
 import pe.fintrack.mobile.ui.theme.data.model.IncomeRequest
 import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
 import java.io.IOException

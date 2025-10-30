@@ -40,7 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import pe.fintrack.mobile.ui.theme.data.Category
+import pe.fintrack.mobile.ui.theme.data.model.Category
+
 
 import pe.fintrack.mobile.ui.viewmodel.FormUiState
 import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel

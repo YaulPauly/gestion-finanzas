@@ -1,6 +1,6 @@
 package pe.fintrack.mobile.ui.theme.data.network
 
-import pe.fintrack.mobile.ui.theme.data.Category
+import pe.fintrack.mobile.ui.theme.data.model.Category
 import pe.fintrack.mobile.ui.theme.data.Goal
 import pe.fintrack.mobile.ui.theme.data.Transaction
 import pe.fintrack.mobile.ui.theme.data.model.*

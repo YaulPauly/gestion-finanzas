@@ -135,7 +135,7 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination,
+            startDestination = startDestination, // <-- RUTA INICIAL DINÁMICA
             modifier = Modifier.padding(innerPadding)
         ) {
             // --- Rutas de Autenticación ---
@@ -170,7 +170,8 @@ fun AppNavigation() {
                 RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable(route = AppScreen.RegistrarGastos.route) {
-                RegistrarGastosScreen(navController = navController)
+                // ¡CORREGIDO! La llamada estaba malformada
+                RegistrarGastoScreen(navController = navController)
             }
 
             // --- Rutas de Edición (CRUD) ---
