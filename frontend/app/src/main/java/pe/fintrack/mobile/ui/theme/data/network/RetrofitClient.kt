@@ -19,7 +19,7 @@ object RetrofitClient {
             .connectTimeout(30, TimeUnit.SECONDS) // Timeout de conexión
             .readTimeout(30, TimeUnit.SECONDS)    // Timeout de lectura
             .writeTimeout(30, TimeUnit.SECONDS)   // Timeout de escritura
-            .addInterceptor(AuthInterceptor())    // <-- Añadiremos este interceptor en el paso 6
+            .addInterceptor(AuthInterceptor())
             .build()
     }
 
@@ -27,8 +27,8 @@ object RetrofitClient {
     // Configuración de Moshi
     private val moshi: Moshi by lazy {
         Moshi.Builder()
-            .add(BigDecimalAdaptador) // Nuestro adaptador para BigDecimal
-            .add(KotlinJsonAdapterFactory()) // ¡Esencial para clases Kotlin!
+            .add(BigDecimalAdaptador)
+            .add(KotlinJsonAdapterFactory())
             .build()
     }
 
@@ -36,7 +36,7 @@ object RetrofitClient {
     val instance: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient) // Usamos nuestro cliente OkHttp personalizado
+            .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi)) // Usamos Moshi para JSON
             .build()
             .create(ApiService::class.java) // Crea la implementación de nuestra interfaz

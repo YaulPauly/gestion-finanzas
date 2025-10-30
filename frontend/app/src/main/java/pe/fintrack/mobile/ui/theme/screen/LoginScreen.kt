@@ -48,7 +48,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = vie
             onValueChange = { password = it },
             label = { Text("Contraseña") },
             modifier = Modifier.fillMaxWidth()
-            // Deberías añadir visualTransformation = PasswordVisualTransformation()
+
         )
         Spacer(modifier = Modifier.height(24.dp))
         // Muestra el botón o un indicador de carga

@@ -1,9 +1,11 @@
 package pe.fintrack.mobile
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ import pe.fintrack.mobile.ui.theme.data.TokenManager
 import pe.fintrack.mobile.ui.theme.screen.*
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TokenManager.init(this)
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
@@ -75,14 +79,7 @@ fun AppNavigation() {
     )
 
     Scaffold(
-        topBar = {
-            if (currentDestination?.route == AppScreen.Home.route) {
-                FinTrackTopBar(
-                    nombreUsuario = "Franco Peralta",
-                    onNotificationClick = { /* TODO: Implementar navegación a notificaciones */ }
-                )
-            }
-        },
+
         bottomBar = {
             NavigationBar (containerColor = Color(0xFF3C467B)){
                 navigationItems.forEach { screen ->
@@ -157,7 +154,7 @@ fun AppNavigation() {
                 GastosScreen(navController = navController, modifier = Modifier)
             }
             composable(route = AppScreen.Movimientos.route) {
-                MovimientosScreen(/*navController = navController*/) // Pasa navController si lo necesita
+                MovimientosScreen(navController = navController)
             }
 
             // --- Rutas de Metas (Goals) ---
@@ -173,21 +170,21 @@ fun AppNavigation() {
                 RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable(route = AppScreen.RegistrarGastos.route) {
+                // ¡CORREGIDO! La llamada estaba malformada
                 RegistrarGastoScreen(navController = navController)
             }
 
             // --- Rutas de Edición (CRUD) ---
             composable(
-                route = AppScreen.EditarIngreso.route, // "editar_ingresos/{transactionId}"
+                route = AppScreen.EditarIngreso.route,
                 arguments = listOf(navArgument("transactionId") { type = NavType.LongType })
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
                 if (transactionId != null) {
-                    // Debes crear esta pantalla "EditarIngresoScreen"
-                    // EditarIngresoScreen(transactionId = transactionId, navController = navController)
-                    // Por ahora, usamos RegistrarIngreso como placeholder si no la tienes:
-                    Text("Placeholder para Editar Ingreso ID: $transactionId")
-                    // RegistrarIngresoScreen(onNavigateBack = { navController.popBackStack() })
+                    EditarIngresoScreen(
+                        transactionId = transactionId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 } else {
                     navController.popBackStack()
                 }
@@ -199,11 +196,9 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val transactionId = backStackEntry.arguments?.getLong("transactionId")
                 if (transactionId != null) {
-                    // Debes crear esta pantalla "EditarGastoScreen"
-                    // EditarGastoScreen(transactionId = transactionId, navController = navController)
-                    // Por ahora, usamos RegistrarGastos como placeholder:
+
                     Text("Placeholder para Editar Gasto ID: $transactionId")
-                    // RegistrarGastosScreen(navController = navController)
+
                 } else {
                     navController.popBackStack()
                 }

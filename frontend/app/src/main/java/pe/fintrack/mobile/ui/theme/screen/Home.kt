@@ -18,10 +18,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import pe.fintrack.mobile.ui.theme.components.AppScreen
+import pe.fintrack.mobile.ui.theme.components.FinTrackTopBar
 import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
+import pe.fintrack.mobile.ui.theme.data.TokenManager
 import pe.fintrack.mobile.ui.theme.data.TransactionType
 import pe.fintrack.mobile.ui.theme.data.viewmodel.DashboardUiState
 import pe.fintrack.mobile.ui.theme.data.viewmodel.HomeViewModel
@@ -33,18 +39,40 @@ import java.util.Locale
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, homeViewModel: HomeViewModel = viewModel()) {
     // estado de viewmodel
     val summaryState by homeViewModel.summaryState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
     // Formatear monedas
     val currencyFormatter = remember { DecimalFormat("S/ #,##0.00",
         DecimalFormatSymbols(Locale("es","PE"))
     )}
 
-
+    val nombreUsuario = remember { TokenManager.getUserName() ?: "Usuario" }
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            // Llama a la función en tu ViewModel para recargar el resumen
+            homeViewModel.fetchSummary()
+        }
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF0F0F0))
     ) {
+        FinTrackTopBar(
+            nombreUsuario = nombreUsuario,
+            onCerrarSesionClick = {
+                TokenManager.clearSession()
+                navController.navigate(AppScreen.Login.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            },
+            onNotificationClick = {
+                // TODO: Lógica para el botón de notificaciones
+            }
+        )
         // Usa un 'when' para reaccionar al estado
         when (val state = summaryState) {
             is DashboardUiState.Loading -> {
@@ -57,7 +85,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                 // --- Muestra los datos cuando la carga es exitosa ---
                 val summary = state.summary
 
-                // --- Componente Saldo Actual ---
+
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -66,8 +94,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                 ) {
                     // Pasa el saldo del ViewModel
                     SaldoActualComponent(
-                        // Convierte BigDecimal a Double si el componente lo requiere,
-                        // aunque sería mejor modificar SaldoActualComponent para aceptar BigDecimal o String formateado.
                         saldoActual = summary.currentBalance.toDouble(),
                         onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
                         onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
@@ -80,7 +106,9 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ResumenCard(
@@ -107,11 +135,16 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)
                 )
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp).weight(1f), /* ... */
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .weight(1f), /* ... */
                 ) {
                     // Muestra la lista de transacciones recientes del ViewModel
                     if (summary.recentTransactions.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp), contentAlignment = Alignment.Center) {
                             Text("No hay movimientos recientes")
                         }
                     } else {
@@ -148,14 +181,16 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
             }
             is DashboardUiState.Error -> {
                 // Muestra un mensaje de error centrado
-                Box(modifier = Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp), contentAlignment = Alignment.Center) {
                     Text(
                         "Error al cargar: ${state.message}",
                         color = MaterialTheme.colorScheme.error,
                         textAlign = TextAlign.Center
                     )
                     // Podrías añadir un botón para reintentar
-                    Button(onClick = { homeViewModel.loadDashboardSummary() }) {
+                    Button(onClick = { homeViewModel.fetchSummary() }) {
                         Text("Reintentar")
                     }
                 }
@@ -218,6 +253,7 @@ fun MovimientoItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
