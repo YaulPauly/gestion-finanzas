@@ -12,6 +12,21 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND) // Establecer 404
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    // Maneja la excepción por reglas de negocio no válidas
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidOperation(InvalidOperationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST) // Establecer 400
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException ex) {
         String message = ex.getReason() != null ? ex.getReason() : "Error en la solicitud.";
@@ -46,4 +61,5 @@ public class GlobalExceptionHandler {
 
         return "No se pudo completar la operación por una violación de integridad de datos.";
     }
+
 }

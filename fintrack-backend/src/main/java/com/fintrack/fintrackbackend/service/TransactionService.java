@@ -13,6 +13,9 @@ import java.util.List;
 public interface TransactionService {
     Transaction createIncomeTransaction(IncomeRequest request, Integer userId);
     Transaction createExpenseTransaction(ExpenseRequest request, Integer userId);
+    Transaction updateExpense(Long id, ExpenseRequest request, Integer userId);
+    Transaction updateIncome(Long id, IncomeRequest request, Integer userId);
+    Transaction getTransactionById(Long id,Integer userId);
     Page<Transaction> getIncomesByUser(Integer userId, int page, int size);
     Page<Transaction> getExpensesByUser(Integer userId, int page, int size);
     List<Transaction> getLastTransactions(Integer userId, int limit);

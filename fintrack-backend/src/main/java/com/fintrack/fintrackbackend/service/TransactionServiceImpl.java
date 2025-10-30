@@ -2,9 +2,13 @@ package com.fintrack.fintrackbackend.service;
 
 import com.fintrack.fintrackbackend.dto.ExpenseRequest;
 import com.fintrack.fintrackbackend.dto.IncomeRequest;
+import com.fintrack.fintrackbackend.exception.InvalidOperationException;
+import com.fintrack.fintrackbackend.exception.ResourceNotFoundException;
+import com.fintrack.fintrackbackend.model.Category;
 import com.fintrack.fintrackbackend.model.Transaction;
 import com.fintrack.fintrackbackend.model.TransactionType;
 import com.fintrack.fintrackbackend.model.User;
+import com.fintrack.fintrackbackend.repository.CategoryRepository;
 import com.fintrack.fintrackbackend.repository.GoalRepository;
 import com.fintrack.fintrackbackend.repository.TransactionRepository;
 import com.fintrack.fintrackbackend.repository.UserRepository;
@@ -37,6 +41,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private GoalRepository goalRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     @Transactional
@@ -84,6 +91,59 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> getLastTransactions(Integer userId, int limit) {
         return transactionRepository.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, limit));
+    }
+
+    @Override
+    public Transaction getTransactionById(Long id,Integer userId) {
+        return transactionRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transacción no encontrada con id: " + id));
+    }
+
+    @Override
+    @Transactional
+    public Transaction updateExpense(Long id, ExpenseRequest request, Integer userId) {
+        // 1. Buscar la transacción existente
+        Transaction existingTransaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gasto no encontrado con id: " + id));
+
+        // 2. Validar que sea un Gasto (si tu API maneja Incomes y Expenses juntas)
+        if (existingTransaction.getType() != TransactionType.EXPENSE) {
+            throw new InvalidOperationException("La transacción con id " + id + " no es un Gasto.");
+        }
+
+        // 3. Actualizar campos
+        existingTransaction.setAmount(request.getAmount());
+        existingTransaction.setDescription(request.getDescription());
+
+        // Actualizar Categoría
+        Category newCategory = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada."));
+
+        existingTransaction.setCategoryId(request.getCategoryId());
+
+        // 4. Guardar y retornar
+        return transactionRepository.save(existingTransaction);
+    }
+
+    @Override
+    @Transactional
+    public Transaction updateIncome(Long id, IncomeRequest request,Integer userId) {
+        Transaction existingTransaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingreso no encontrado con id: " + id));
+        // 1. Validar que sea un Ingreso (INCOME)
+        if (existingTransaction.getType() != TransactionType.INCOME) {
+            throw new InvalidOperationException("La transacción con id " + id + " no es un Ingreso.");
+        }
+        // 2. Actualizar campos (Monto y Descripción)
+        existingTransaction.setAmount(request.getAmount());
+        existingTransaction.setDescription(request.getDescription());
+        // 3. Actualizar Categoría
+        Category newCategory = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada."));
+
+        existingTransaction.setCategoryId(request.getCategoryId());
+        // 4. Guardar y retornar
+        return transactionRepository.save(existingTransaction);
     }
 
     @Override
