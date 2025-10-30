@@ -291,20 +291,6 @@ fun EditarGastoScreen(
                         }
                     }
 
-                    // --- Opcional: Botón Eliminar ---
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedButton(
-                        onClick = {
-                            // TODO: Implementar lógica de eliminación y confirmación en el ViewModel
-                            Toast.makeText(context, "Eliminar Gasto ID: $expenseId (TODO)", Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Eliminar Gasto")
-                    }
                 }
             }
         }

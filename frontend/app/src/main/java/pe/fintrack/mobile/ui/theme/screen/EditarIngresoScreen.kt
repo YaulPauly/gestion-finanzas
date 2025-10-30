@@ -234,20 +234,6 @@ fun EditarIngresoScreen(
                     }
                 }
 
-                // --- (Opcional) Botón Eliminar ---
-                OutlinedButton(
-                    onClick = {
-                        // 6. Llama a DELETE (necesitas añadir 'deleteIncome' al ViewModel)
-                        // viewModel.deleteIncome(transactionId, onNavigateBack)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Eliminar Ingreso")
-                }
-
                 // Muestra mensaje de error si existe
                 if (formState is FormUiState.Error) {
                     Text(
