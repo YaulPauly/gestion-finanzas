@@ -82,6 +82,35 @@ Devuelve saldo actual, totales del mes y últimas 4 transacciones para el usuari
   curl -s "http://localhost:8080/api/transactions/income?page=0&size=10" \
     -H "Authorization: Bearer $TOKEN"
   ```
+- Actualizar gasto:
+  ```bash
+  curl -s -X PUT http://localhost:8080/api/transactions/expense/{id} \
+    -H 'Content-Type: application/json' \
+    -H "Authorization: Bearer $TOKEN" \
+    -d '{
+          "amount": 150.75, 
+          "categoryId": 2, 
+          "description": "Cena de negocios - Actualizado"
+        }'
+  ```
+- Actualizar ingreso:
+  ```bash
+  curl -s -X PUT http://localhost:8080/api/transactions/income/{id} \
+    -H 'Content-Type: application/json' \
+    -H "Authorization: Bearer $TOKEN" \
+    -d '{
+          "amount": 3200.00, 
+          "categoryId": 1, 
+          "description": "Salario mensual - Actualizado"
+        }'
+  ```
+
+- Obtener detalle de transacción:
+  ```bash
+  curl -s -X GET http://localhost:8080/api/transactions/{id} \
+    -H 'Content-Type: application/json' \
+    -H "Authorization: Bearer $TOKEN"
+  ```
 
 ### Categorías
 
