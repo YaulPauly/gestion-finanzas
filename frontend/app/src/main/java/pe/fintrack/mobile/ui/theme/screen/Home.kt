@@ -20,8 +20,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import pe.fintrack.mobile.ui.theme.components.AppScreen
+import pe.fintrack.mobile.ui.theme.components.FinTrackTopBar
 import pe.fintrack.mobile.ui.theme.components.SaldoActualComponent
+import pe.fintrack.mobile.ui.theme.data.TokenManager
 import pe.fintrack.mobile.ui.theme.data.TransactionType
 import pe.fintrack.mobile.ui.theme.data.viewmodel.DashboardUiState
 import pe.fintrack.mobile.ui.theme.data.viewmodel.HomeViewModel
@@ -38,6 +41,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
         DecimalFormatSymbols(Locale("es","PE"))
     )}
 
+    val nombreUsuario = remember { TokenManager.getUserName() ?: "Usuario" }
 
 
     Column(
@@ -45,6 +49,21 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
             .fillMaxSize()
             .background(Color(0xFFF0F0F0))
     ) {
+        FinTrackTopBar(
+            nombreUsuario = nombreUsuario,
+            onCerrarSesionClick = {
+                TokenManager.clearSession()
+                navController.navigate(AppScreen.Login.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                }
+            },
+            onNotificationClick = {
+                // TODO: Lógica para el botón de notificaciones
+            }
+        )
         // Usa un 'when' para reaccionar al estado
         when (val state = summaryState) {
             is DashboardUiState.Loading -> {
@@ -57,7 +76,7 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                 // --- Muestra los datos cuando la carga es exitosa ---
                 val summary = state.summary
 
-                // --- Componente Saldo Actual ---
+
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -66,8 +85,6 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, home
                 ) {
                     // Pasa el saldo del ViewModel
                     SaldoActualComponent(
-                        // Convierte BigDecimal a Double si el componente lo requiere,
-                        // aunque sería mejor modificar SaldoActualComponent para aceptar BigDecimal o String formateado.
                         saldoActual = summary.currentBalance.toDouble(),
                         onRegistrarGastoClick = { navController.navigate(AppScreen.RegistrarGastos.route) },
                         onRegistrarIngresoClick = { navController.navigate(AppScreen.RegistrarIngreso.route) }
@@ -218,6 +235,7 @@ fun MovimientoItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .background(Color.White, shape = RoundedCornerShape(8.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -35,9 +35,9 @@ class AuthViewModel : ViewModel() {
                 val response = RetrofitClient.instance.login(LoginRequest(email, password))
 
                 if (response.isSuccessful && response.body() != null) {
-                    // Éxito: Guarda el token y actualiza el estado
+
                     val loginData = response.body()!!
-                    TokenManager.saveToken(loginData.token)
+                    TokenManager.saveSession(loginData)
                     _loginState.value = LoginUiState.Success(loginData)
                 } else {
                     // Error HTTP (ej: 401 Unauthorized)
@@ -55,7 +55,7 @@ class AuthViewModel : ViewModel() {
     }
 
     fun logout() {
-        TokenManager.clearToken()
+        TokenManager.clearSession()
         _loginState.value = LoginUiState.Idle
     }
 

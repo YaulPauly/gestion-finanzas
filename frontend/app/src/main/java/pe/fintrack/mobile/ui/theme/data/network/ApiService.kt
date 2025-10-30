@@ -80,4 +80,8 @@ interface ApiService {
 
     @POST("api/goals/{id}/archive") // Asumiendo que es un POST
     suspend fun archiveGoal(@Path("id") goalId: Long): Response<Goal> // Devuelve la meta actualizada
+
+    @GET("api/transaction/{id}")
+    suspend fun getTransactionById(@Path("id") transactionId: Long): Response<Transaction>
+
 }
