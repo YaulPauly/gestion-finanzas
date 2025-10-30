@@ -1,9 +1,11 @@
 package pe.fintrack.mobile
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -43,6 +45,7 @@ import pe.fintrack.mobile.ui.theme.data.TokenManager
 import pe.fintrack.mobile.ui.theme.screen.*
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TokenManager.init(this)
@@ -55,6 +58,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
@@ -150,7 +154,7 @@ fun AppNavigation() {
                 GastosScreen(navController = navController, modifier = Modifier)
             }
             composable(route = AppScreen.Movimientos.route) {
-                MovimientosScreen(/*navController = navController*/)
+                MovimientosScreen(navController = navController)
             }
 
             // --- Rutas de Metas (Goals) ---
