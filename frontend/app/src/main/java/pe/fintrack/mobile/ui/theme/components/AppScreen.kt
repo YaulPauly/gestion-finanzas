@@ -18,7 +18,7 @@ sealed class AppScreen(val route: String, val title: String) {
         fun createRoute(transactionId: Long) = "editar_gastos/$transactionId"
     }
 
-    object Movimientos : AppScreen("movimientos", "Movimientos")
+    object Movimientos : AppScreen("movimientos", "Actividad")
 
     // ------------- METAS ---------------
     object ListaMetas : AppScreen("lista_metas", "Metas")
