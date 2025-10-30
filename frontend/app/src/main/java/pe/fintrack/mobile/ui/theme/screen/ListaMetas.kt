@@ -45,9 +45,9 @@ fun ListaMetasScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            // Si la pantalla vuelve a primer plano (ej. al volver de 'Contribuir')
+
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.loadGoals() // Recarga los datos
+                viewModel.loadGoals()
             }
         }
 
