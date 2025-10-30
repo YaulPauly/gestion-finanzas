@@ -27,13 +27,14 @@ class ExpenseViewModel(
     private val _categoryState = MutableStateFlow<List<Category>>(emptyList())
     val categoryState: StateFlow<List<Category>> = _categoryState.asStateFlow()
 
-    // --- Opcional: Estado para registrar/editar un gasto ---
-    // (Útil para saber si la operación fue exitosa)
+    // --- ESTADOS PARA LA EDICIÓN ---
+    private val _selectedTransaction = MutableStateFlow<Transaction?>(null)
+    val selectedTransaction: StateFlow<Transaction?> = _selectedTransaction.asStateFlow()
+
     private val _expenseActionState = MutableStateFlow<ExpenseActionState>(ExpenseActionState.Idle)
     val expenseActionState: StateFlow<ExpenseActionState> = _expenseActionState.asStateFlow()
 
     init {
-        // Carga inicial de gastos al crear el ViewModel
         loadExpenses()
         loadCategories()
     }
@@ -205,19 +206,32 @@ class ExpenseViewModel(
             }
         }
     }
-    suspend fun getExpenseById(id: Long): Transaction? {
-        return try {
-            val response = apiService.getTransactionDetails(id)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                Log.e("ExpenseViewModel", "Error al obtener transacción ${id}: ${response.code()}")
-                null
+    fun loadTransactionDetails(id: Long) {
+        // Usaremos el ActionState para mostrar el Loading/Error en la pantalla de edición
+        _expenseActionState.value = ExpenseActionState.Loading
+        _selectedTransaction.value = null // Limpiar el anterior
+
+        viewModelScope.launch {
+            try {
+                // Endpoint genérico para obtener la transacción
+                val response = apiService.getTransactionDetails(id)
+
+                if (response.isSuccessful && response.body() != null) {
+                    _selectedTransaction.value = response.body()
+                    _expenseActionState.value = ExpenseActionState.Idle
+                } else {
+                    _expenseActionState.value =
+                        ExpenseActionState.Error("No se pudo cargar el detalle: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                _expenseActionState.value =
+                    ExpenseActionState.Error("Error de conexión al cargar el detalle.")
             }
-        } catch (e: Exception) {
-            Log.e("ExpenseViewModel", "Fallo de red al obtener transacción ${id}", e)
-            null
         }
+    }
+    fun resetSelectedTransaction() {
+        _selectedTransaction.value = null
+        resetActionState()
     }
 }
 

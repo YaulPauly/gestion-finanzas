@@ -60,15 +60,19 @@ import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModelFactory
 fun EditarGastoScreen(
     navController: NavController,
     expenseId: Long, // Recibe el ID del gasto a editar
-    expenseViewModel: ExpenseViewModel = viewModel(
-        factory = ExpenseViewModelFactory (RetrofitClient.instance)
-    )
 ) {
     val context = LocalContext.current
+    // 1. Obtener la dependencia ApiService
+    val apiService = RetrofitClient.instance
+
+    // 2. Crear la Factory
+    val factory = ExpenseViewModelFactory(apiService)
+
+    // 3. Obtener el ViewModel usando la Factory
+    val viewModel: ExpenseViewModel = viewModel(factory = factory)
 
     // --- ESTADOS LOCALES ---
     var initialLoadComplete by remember { mutableStateOf(false) }
-    var currentTransaction by remember { mutableStateOf<Transaction?>(null) }
 
     // Estados del formulario
     var amountInput by remember { mutableStateOf("") }
@@ -77,37 +81,28 @@ fun EditarGastoScreen(
 
     // Estados del ViewModel
     var isCategoryDropdownExpanded by remember { mutableStateOf(false) }
-    val categories by expenseViewModel.categoryState.collectAsState()
-    val actionState by expenseViewModel.expenseActionState.collectAsState()
+    val categorias by viewModel.categoryState.collectAsState()
+    val actionState by viewModel.expenseActionState.collectAsState()
+    val transactionToEdit by viewModel.selectedTransaction.collectAsState()
     val isLoading = actionState is ExpenseActionState.Loading
 
     // 1. Carga los detalles del gasto al iniciar la pantalla
     LaunchedEffect(expenseId) {
-        if (!initialLoadComplete) {
-            val transaction = expenseViewModel.getExpenseById(expenseId)
 
-            if (transaction != null) {
-                currentTransaction = transaction
-                // Rellena el formulario
-                amountInput = transaction.amount.toPlainString()
-                descriptionInput = transaction.description ?: ""
-
-                // Encontrar y establecer la categoría inicial (requiere que 'categories' ya esté cargada)
-                // Usamos LaunchedEffect separado para esperar por categories si es necesario
-                // Pero lo haremos en el siguiente LaunchedEffect para simplificar.
-
-            } else {
-                Toast.makeText(context, "Error al cargar el gasto.", Toast.LENGTH_SHORT).show()
-                navController.popBackStack()
-            }
+        viewModel.loadTransactionDetails(expenseId)
+        // Asegurarse de que las categorías estén cargadas
+        if (categorias.isEmpty()) {
+            viewModel.loadCategories()
         }
     }
 
     // 2. Rellena la Categoría una vez que tanto el Gasto como la lista de Categorías estén listos
-    LaunchedEffect(currentTransaction, categories) {
-        if (currentTransaction != null && categories.isNotEmpty()) {
-            selectedCategory = categories.find { it.id == currentTransaction!!.categoryId }
-            initialLoadComplete = true
+    LaunchedEffect(transactionToEdit, categorias) {
+        transactionToEdit?.let { transaction ->
+            amountInput = transaction.amount.toPlainString()
+            descriptionInput = transaction.description ?: ""
+            selectedCategory = categorias.find { it.id == transaction.categoryId }
+            initialLoadComplete = true // Indica que los campos están listos
         }
     }
 
@@ -116,13 +111,13 @@ fun EditarGastoScreen(
         when (val state = actionState) {
             is ExpenseActionState.Success -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
-                expenseViewModel.resetActionState()
+                viewModel.resetActionState()
                 navController.popBackStack() // Vuelve a la lista
             }
             is ExpenseActionState.Error -> {
                 Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
                 // No volvemos, permitimos al usuario intentar de nuevo
-                expenseViewModel.resetActionState()
+                viewModel.resetActionState()
             }
             else -> {}
         }
@@ -229,7 +224,7 @@ fun EditarGastoScreen(
                             onDismissRequest = { isCategoryDropdownExpanded = false },
                             modifier = Modifier.fillMaxWidth(0.85f)
                         ) {
-                            categories.forEach { category ->
+                            categorias.forEach { category: Category ->
                                 DropdownMenuItem(
                                     text = { Text(category.name) },
                                     onClick = {
@@ -281,7 +276,7 @@ fun EditarGastoScreen(
                             )
 
                             // 4. Llama a la función de ACTUALIZACIÓN con el ID
-                            expenseViewModel.updateExpense(expenseId, request)
+                            viewModel.updateExpense(expenseId, request)
                         },
                         enabled = !isLoading,
                         shape = RoundedCornerShape(25.dp),
