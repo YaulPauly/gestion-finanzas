@@ -106,7 +106,7 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction existingTransaction = transactionRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Gasto no encontrado o no pertenece al usuario con id: " + id));
 
-        // 2. Validar que sea un Gasto (si tu API maneja Incomes y Expenses juntas)
+        // 2. Validar que sea un Gasto
         if (existingTransaction.getType() != TransactionType.EXPENSE) {
             throw new InvalidOperationException("La transacción con id " + id + " no es un Gasto.");
         }
