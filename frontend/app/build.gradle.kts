@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    //Dependencia para Servicios de google
+   // id("com.google.gms.google-services")
 }
 
 android {
@@ -36,6 +38,10 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
 
@@ -45,6 +51,20 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Convertidor Moshi
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    //Moshi traductor JSON
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+    // Interceptor de OkHttp (Para ver las llamadas en Logcat)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+
+    //Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
