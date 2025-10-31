@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import pe.fintrack.mobile.ui.theme.FintrackMobileTheme
 import pe.fintrack.mobile.ui.theme.data.model.Category
+import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
+import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModel
+import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModelFactory
 import pe.fintrack.mobile.ui.viewmodel.FormUiState
 import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 
@@ -26,7 +29,9 @@ import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrarIngresoScreen(onNavigateBack: () -> Unit, viewModel: TransactionViewModel = viewModel()) {
+fun RegistrarIngresoScreen(onNavigateBack: () -> Unit, viewModel: TransactionViewModel = viewModel(
+    factory = ExpenseViewModelFactory (RetrofitClient.instance)
+)) {
     // Estados para los campos del formulario
     var monto by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<Category?>(null) } // Almacena el objeto Category
@@ -34,8 +39,12 @@ fun RegistrarIngresoScreen(onNavigateBack: () -> Unit, viewModel: TransactionVie
 
     // Estados para el UI
     var expanded by remember { mutableStateOf(false) }
-    val categorias by viewModel.categories.collectAsState() // 2. Obtiene categorías del ViewModel
-    val formState by viewModel.formState.collectAsState() // 3. Observa el estado del form
+    val categorias by viewModel.categories.collectAsState()
+    val formState by viewModel.formState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCategories()
+    }
 
     // Resetea el estado cuando sales de la pantalla
     DisposableEffect(Unit) {

@@ -62,7 +62,10 @@ import java.math.BigDecimal
 @Composable
 fun RegistrarGastoScreen(
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ExpenseViewModel = viewModel(
+        factory = ExpenseViewModelFactory(RetrofitClient.instance)
+    )
 ) {
     // 1. OBTENCIÓN DEL VIEWMODEL Y ESTADOS
     val apiService = remember { RetrofitClient.instance }

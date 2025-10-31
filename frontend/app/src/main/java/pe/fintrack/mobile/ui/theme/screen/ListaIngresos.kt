@@ -31,28 +31,29 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import pe.fintrack.mobile.ui.theme.components.AppScreen // Importa tu sealed class
 import pe.fintrack.mobile.ui.theme.data.Transaction
+import pe.fintrack.mobile.ui.theme.data.network.RetrofitClient
+import pe.fintrack.mobile.ui.theme.data.viewmodel.ExpenseViewModelFactory
 import pe.fintrack.mobile.ui.theme.data.viewmodel.IncomeListUiState
 import pe.fintrack.mobile.ui.theme.data.viewmodel.IncomeViewModel
+import pe.fintrack.mobile.ui.viewmodel.TransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-// Clase de datos de ejemplo
 
 
 @Composable
 fun ListaIngresosScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    incomeViewModel: IncomeViewModel = viewModel()
+    viewModel: IncomeViewModel = viewModel()
 ){
 
-    val uiState by incomeViewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                incomeViewModel.loadIncomes()
+                viewModel.loadIncomes()
             }
         }
 
